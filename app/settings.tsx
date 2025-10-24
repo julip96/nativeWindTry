@@ -2,11 +2,10 @@ import React from 'react'
 import { View, Text, H1, ScrollView } from 'dripsy'
 import { Switch } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
-import { useThemeMode } from '../components/themeProvider'
+import { useThemeMode } from '../components/ThemeProvider'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Account from '@/components/account'
-import { Session } from '@supabase/supabase-js'
-import { useSession } from '@/components/sessionProvider'
+import Account from '../components/account'
+import { useSession } from '@/components/SessionProvider'
 
 export default function SettingsScreen() {
 
@@ -16,9 +15,6 @@ export default function SettingsScreen() {
 
     const isStandard = mode === 'standard'
     const isPink = mode === 'pink'
-
-    console.log('Session in settings screen:', session) // ✅ should now show user info!
-
 
     return (
 

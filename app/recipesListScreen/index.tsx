@@ -6,37 +6,45 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar';
 
-const defaultRecipes = [
-    { id: '1', title: 'Pasta Carbonara', description: 'Creamy Italian classic' },
-    { id: '2', title: 'Avocado Toast', description: 'Quick and healthy' },
-]
-
 export default function RecipesListScreen() {
+
     const router = useRouter()
     const [savedRecipes, setSavedRecipes] = React.useState([])
 
     useFocusEffect(
+
         React.useCallback(() => {
+
             loadRecipes()
+
         }, [])
+
     )
 
     async function loadRecipes() {
+
         try {
+
             const keys = await AsyncStorage.getAllKeys()
+
             const recipeKeys = keys.filter((key) => key.startsWith('recipe-'))
 
             const items = await AsyncStorage.multiGet(recipeKeys)
+
             const loadedRecipes = items.map(([key, value]) => JSON.parse(value!))
 
             setSavedRecipes(loadedRecipes)
+
             console.log('Loaded recipes:', loadedRecipes)
+
         } catch (e) {
+
             console.error('Error loading recipes:', e)
+
         }
     }
 
-    const allRecipes = [...defaultRecipes, ...savedRecipes]
+    const allRecipes = [...savedRecipes]
 
     return (
 
@@ -70,9 +78,11 @@ export default function RecipesListScreen() {
                     <Text variant="heading">My Recipes</Text>
 
                     <Pressable
+
                         android_ripple={{ color: '#ccc' }}
                         onPress={() => router.push('/recipesListScreen/newRecipe')}
                         style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+
                     >
                         <View
 
@@ -97,10 +107,10 @@ export default function RecipesListScreen() {
                 </View>
 
                 {/* Recipe cards */}
-                {allRecipes.length === 0 ? (
+                {savedRecipes.length === 0 ? (
                     <Text>No recipes found.</Text>
                 ) : (
-                    allRecipes.map((recipe) => (
+                    savedRecipes.map((recipe) => (
 
                         <View
 
@@ -144,11 +154,17 @@ export default function RecipesListScreen() {
                                     }}
                                 >
                                     <Text sx={{ color: 'white', fontWeight: 'bold' }}>View</Text>
+
                                 </View>
+
                             </Pressable>
+
                         </View>
+
                     ))
+
                 )}
+
             </ScrollView>
 
 
