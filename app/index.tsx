@@ -1,56 +1,62 @@
 import { Text, View, H1, H2, P, A, Container } from "dripsy";
 import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   return (
 
-    <View sx={{
-      backgroundColor: '$background',
-      padding: 20,
-      margin: 5,
-      flex: 1,
-      marginTop: 50,
-      marginBottom: 250,
-      borderRadius: 5
-    }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fffaf0' }}>
 
-
-      <H1 sx={{
-        color: '$text', fontSize: 20, marginTop: 20,
-        textShadow: 'onImage'
+      <View sx={{
+        backgroundColor: '$background',
+        padding: 20,
+        margin: 5,
+        flex: 1,
+        marginTop: 50,
+        marginBottom: 250,
+        borderRadius: 5
       }}>
 
-        Willkommen!
 
-      </H1>
+        <H1 sx={{
+          color: '$text', fontSize: 20, marginTop: 20,
+          textShadow: 'onImage'
+        }}>
 
-      <P sx={{ color: '$text', fontSize: 20, marginTop: 20 }}>
+          Welcome!
 
+        </H1>
 
-        This is the welcome screen for the prototype of my app.
-
-      </P>
-
-      <A sx={{ color: '$text', fontSize: 20, marginTop: 20 }} href="https://dripsy.xyz">
-
-        In the final version, this will be gone.
-
-      </A>
+        <P sx={{ color: '$text', fontSize: 20, marginTop: 20 }}>
 
 
+          This is the welcome screen for the prototype of my app.
 
-      <Text sx={{ color: '$text', fontSize: 20, marginTop: 20 }}>
+        </P>
 
-        Feel free to explore the app!
+        <A sx={{ color: '$text', fontSize: 20, marginTop: 20 }} href="https://dripsy.xyz">
 
-      </Text>
+          In the final version, this will be gone.
 
-      <StatusBar style="dark" />
+        </A>
 
 
 
+        <Text sx={{ color: '$text', fontSize: 20, marginTop: 20 }}>
+
+          Feel free to explore the app!
+
+        </Text>
+
+        <StatusBar style="dark" />
 
 
-    </View>
+
+
+
+      </View>
+
+    </SafeAreaView>
+
   );
 }
