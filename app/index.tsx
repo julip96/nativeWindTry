@@ -8,6 +8,7 @@ export default function Index() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fffaf0' }}>
 
       <View sx={{
+
         backgroundColor: '$background',
         padding: 20,
         margin: 5,
@@ -15,12 +16,15 @@ export default function Index() {
         marginTop: 50,
         marginBottom: 250,
         borderRadius: 5
+
       }}>
 
 
         <H1 sx={{
+
           color: '$text', fontSize: 20, marginTop: 20,
           textShadow: 'onImage'
+
         }}>
 
           Welcome!
@@ -49,10 +53,6 @@ export default function Index() {
         </Text>
 
         <StatusBar style="dark" />
-
-
-
-
 
       </View>
 

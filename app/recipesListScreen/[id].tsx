@@ -6,6 +6,7 @@ import { Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 export default function RecipeDetailsScreen() {
+
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const [recipe, setRecipe] = React.useState<any | null>(null);
@@ -15,14 +16,23 @@ export default function RecipeDetailsScreen() {
         const loadRecipe = async () => {
 
             try {
+
                 const data = await AsyncStorage.getItem(`recipe-${id}`);
+
                 if (data) {
+
                     setRecipe(JSON.parse(data));
+
                 } else {
+
                     setRecipe(null);
+
                 }
+
             } catch (e) {
+
                 console.error('Error loading recipe:', e);
+
             }
 
         }
@@ -34,17 +44,40 @@ export default function RecipeDetailsScreen() {
     if (!recipe) return <Text>Recipe not found</Text>
 
     const deleteRecipe = async () => {
+
         await AsyncStorage.removeItem(`recipe-${id}`);
         router.back();
+
     }
 
     return (
+
         <ScrollView>
+
             <View sx={{ flex: 1, bg: '$background', p: 'm' }}>
+
                 <Text variant="heading" sx={{ mb: 'm' }}>
+
                     {recipe.title}
+
                 </Text>
-                <Text variant="body">{recipe.description}</Text>
+
+                <Text variant="heading" sx={{ mb: 'm' }}>
+
+                    Ingredients:
+
+                </Text>
+
+                <Text variant="body">{recipe.ingredients}</Text>
+
+                <Text variant="heading" sx={{ mb: 'm' }}>
+
+                    Instructions:
+
+                </Text>
+
+                <Text variant="body">{recipe.instructions}</Text>
+
             </View>
 
             {/* Delete Recipe */}
