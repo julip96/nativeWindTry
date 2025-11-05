@@ -4,7 +4,7 @@ import { Switch } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { useThemeMode } from '../components/ThemeProvider'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Account from '../components/account'
+import Account from '../components/Account'
 import { useSession } from '@/components/SessionProvider'
 
 export default function SettingsScreen() {
