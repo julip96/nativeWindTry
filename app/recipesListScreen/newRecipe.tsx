@@ -3,6 +3,12 @@ import { View, Text, TextInput, ScrollView, Image } from "dripsy";
 import { Pressable, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
+import { supabase } from "../../utils/supabase";
+
+import { Session } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
+
+
 
 type Recipe = {
 
@@ -15,6 +21,23 @@ type Recipe = {
 };
 
 export default function NewRecipe() {
+
+
+
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data, error } = await supabase.auth.getUser();
+            if (error) {
+                console.error('Error fetching user:', error);
+                return;
+            }
+            setUserId(data?.user?.id ?? null);
+        };
+
+        fetchUser();
+    }, []);
 
     const [recipe, setRecipe] = React.useState<Recipe>({
 
@@ -91,6 +114,11 @@ export default function NewRecipe() {
     // 💾 Save recipe
     async function handleSaveRecipe(recipe: Recipe) {
 
+        if (!userId) {
+            Alert.alert('User not loaded yet', 'Please wait a moment and try again');
+            return;
+        }
+
         try {
 
             const newRecipe = {
@@ -102,6 +130,32 @@ export default function NewRecipe() {
 
             const jsonValue = JSON.stringify(newRecipe);
             await AsyncStorage.setItem(`recipe-${newRecipe.id}`, jsonValue);
+
+            // I try to add a new recipe to the db supabase now
+
+            const { data, error } = await supabase
+                .from('recipes') // Replace with your table name
+                .insert([
+                    {
+
+                        user_id: userId,
+                        image_url: '',
+                        title: newRecipe.title,
+                        ingredients: newRecipe.ingredients,
+                        instructions: newRecipe.instructions,
+                        rating: 1.0,
+                        private: true,
+                        created_at: new Date().toISOString(),
+
+                    }, // Data to insert
+                ])
+                .select(); // To return the inserted data
+
+            if (error) {
+                console.error('Error saving data:', error);
+            } else {
+                console.log('Data saved successfully:', data);
+            }
 
             console.log("Recipe saved:", newRecipe);
 
