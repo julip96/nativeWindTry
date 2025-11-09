@@ -1,30 +1,27 @@
 import React from "react";
 import { View, Text, TextInput, ScrollView, Image } from "dripsy";
 import { Pressable, Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "../../utils/supabase";
-
-import { Session } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
-
-
-
-type Recipe = {
-
-    id: string;
-    title: string;
-    ingredients: string;
-    instructions: string;
-    image: string;
-
-};
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 export default function NewRecipe() {
 
+    const { book_id } = useLocalSearchParams()
 
+    const router = useRouter()
 
-    const [userId, setUserId] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null)
+
+    const [recipe, setRecipe] = useState({
+
+        title: '',
+        ingredients: '',
+        instructions: '',
+        image: ''
+
+    })
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -39,19 +36,7 @@ export default function NewRecipe() {
         fetchUser();
     }, []);
 
-    const [recipe, setRecipe] = React.useState<Recipe>({
-
-        id: "",
-        title: "",
-        ingredients: "",
-        instructions: "",
-        image: "",
-
-    });
-
-    const [savedRecipes, setSavedRecipes] = React.useState<Recipe[]>([]);
-
-    function handleChange(key: keyof Recipe, value: string) {
+    function handleChange(key: keyof typeof recipe, value: string) {
         setRecipe((prev) => ({ ...prev, [key]: value }));
     }
 
@@ -112,93 +97,48 @@ export default function NewRecipe() {
     }
 
     // 💾 Save recipe
-    async function handleSaveRecipe(recipe: Recipe) {
+    async function handleSaveRecipe() {
 
-        if (!userId) {
-            Alert.alert('User not loaded yet', 'Please wait a moment and try again');
+        console.log('saving recipe...', { book_id })
+
+        if (!userId || !book_id) {
+            Alert.alert('Error', 'Mising user or book info');
             return;
         }
 
         try {
 
-            const newRecipe = {
-
-                ...recipe,
-                id: Date.now().toString(),
-
-            };
-
-            const jsonValue = JSON.stringify(newRecipe);
-            await AsyncStorage.setItem(`recipe-${newRecipe.id}`, jsonValue);
-
-            // I try to add a new recipe to the db supabase now
-
             const { data, error } = await supabase
-                .from('recipes') // Replace with your table name
+                .from('recipes')
                 .insert([
+
                     {
 
                         user_id: userId,
-                        image_url: '',
-                        title: newRecipe.title,
-                        ingredients: newRecipe.ingredients,
-                        instructions: newRecipe.instructions,
-                        rating: 1.0,
+                        book_id,
+                        image_url: recipe.image,
+                        title: recipe.title,
+                        ingredients: recipe.ingredients,
+                        instructions: recipe.instructions,
+                        rating: 0,
                         private: true,
-                        created_at: new Date().toISOString(),
 
-                    }, // Data to insert
+                    },
+
                 ])
-                .select(); // To return the inserted data
+                .select()
 
-            if (error) {
-                console.error('Error saving data:', error);
-            } else {
-                console.log('Data saved successfully:', data);
-            }
+            if (error) throw error
 
-            console.log("Recipe saved:", newRecipe);
 
-            setRecipe({
-
-                id: "",
-                title: "",
-                ingredients: "",
-                instructions: "",
-                image: "",
-
-            });
 
             Alert.alert('Success, Recipe saved!');
+            router.back()
 
         } catch (e) {
 
             console.error("Error saving recipe:", e);
-
-        }
-
-    }
-
-    // 📥 Load saved recipes
-    async function handleLoadRecipe() {
-
-        try {
-
-            const keys = await AsyncStorage.getAllKeys();
-            const recipeKeys = keys.filter((key) => key.startsWith("recipe-"));
-            const items = await AsyncStorage.multiGet(recipeKeys);
-
-            const loadedRecipes: Recipe[] = items.map(([key, value]) =>
-
-                JSON.parse(value!)
-
-            );
-
-            setSavedRecipes(loadedRecipes);
-
-        } catch (e) {
-
-            console.error("Error loading recipe:", e);
+            Alert.alert('Error', 'Could not save recipe.')
 
         }
 
@@ -357,7 +297,7 @@ export default function NewRecipe() {
                 <Pressable
 
                     android_ripple={{ color: "#ccc" }}
-                    onPress={() => handleSaveRecipe(recipe)}
+                    onPress={() => handleSaveRecipe()}
                     style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
 
                 >
@@ -376,82 +316,11 @@ export default function NewRecipe() {
 
                     >
 
-                        <Text sx={{ color: "white", fontWeight: "bold" }}>Add recipe</Text>
+                        <Text sx={{ color: "white", fontWeight: "bold" }}>Save</Text>
 
                     </View>
 
                 </Pressable>
-
-                {/* 📥 Load */}
-
-                <Pressable
-
-                    android_ripple={{ color: "#ccc" }}
-                    onPress={handleLoadRecipe}
-                    style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-
-                >
-                    <View
-
-                        sx={{
-
-                            bg: "$secondary",
-                            p: "m",
-                            borderRadius: "m",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            mt: "s",
-
-                        }}
-
-                    >
-
-                        <Text sx={{ color: "white", fontWeight: "bold" }}>Load recipes</Text>
-
-                    </View>
-
-                </Pressable>
-
-                {/* 🧾 Display loaded recipes */}
-                {savedRecipes.length > 0 && (
-
-                    <View sx={{ mt: "m" }}>
-
-                        <Text variant="heading">Loaded Recipes:</Text>
-
-                        {savedRecipes.map((r) => (
-
-                            <View key={r.id} sx={{ mt: "s" }}>
-
-                                <Text>Title: {r.title}</Text>
-
-                                {r.image ? (
-
-                                    <Image
-
-                                        source={{ uri: r.image }}
-
-                                        style={{
-
-                                            width: 120,
-                                            height: 120,
-                                            borderRadius: 8,
-                                            marginTop: 4,
-                                            resizeMode: "cover",
-
-                                        }}
-
-                                    />
-
-                                ) : null}
-
-                            </View>
-
-                        ))}
-
-                    </View>
-
-                )}
 
             </View>
 

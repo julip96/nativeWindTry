@@ -1,15 +1,18 @@
 import React from 'react'
 import { Platform, Pressable } from 'react-native'
 import { View, Text, ScrollView } from 'dripsy'
-import { useRouter, useFocusEffect } from 'expo-router'
+import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar';
+import { supabase } from '../../utils/supabase'
 
 export default function RecipesListScreen() {
 
     const router = useRouter()
-    const [savedRecipes, setSavedRecipes] = React.useState([])
+    const { book_id } = useLocalSearchParams()
+    const [recipes, setRecipes] = React.useState<any[]>([])
+    const [loading, setLoading] = React.useState(false)
 
     useFocusEffect(
 
@@ -17,34 +20,37 @@ export default function RecipesListScreen() {
 
             loadRecipes()
 
-        }, [])
+        }, [book_id])
 
     )
 
     async function loadRecipes() {
 
+        if (!book_id) return
+
         try {
 
-            const keys = await AsyncStorage.getAllKeys()
+            setLoading(true)
 
-            const recipeKeys = keys.filter((key) => key.startsWith('recipe-'))
+            const { data, error } = await supabase
+                .from('recipes')
+                .select('*')
+                .eq('book_id', book_id)
+                .order('created_at', { ascending: false })
 
-            const items = await AsyncStorage.multiGet(recipeKeys)
-
-            const loadedRecipes = items.map(([key, value]) => JSON.parse(value!))
-
-            setSavedRecipes(loadedRecipes)
-
-            console.log('Loaded recipes:', loadedRecipes)
+            if (error) throw error
+            setRecipes(data || [])
 
         } catch (e) {
 
             console.error('Error loading recipes:', e)
 
+        } finally {
+
+            setLoading(false)
+
         }
     }
-
-    const allRecipes = [...savedRecipes]
 
     return (
 
@@ -75,12 +81,12 @@ export default function RecipesListScreen() {
                     }}
                 >
 
-                    <Text variant="heading">My Recipes</Text>
+                    <Text variant="heading">Recipes in this book</Text>
 
                     <Pressable
 
                         android_ripple={{ color: '#ccc' }}
-                        onPress={() => router.push('/recipesListScreen/newRecipe')}
+                        onPress={() => router.push(`/recipesListScreen/newRecipe?book_id=${book_id}`)}
                         style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
 
                     >
@@ -107,10 +113,12 @@ export default function RecipesListScreen() {
                 </View>
 
                 {/* Recipe cards */}
-                {savedRecipes.length === 0 ? (
-                    <Text>No recipes found.</Text>
+                {loading ? (
+                    <Text>Loading recipes...</Text>
+                ) : recipes.length === 0 ? (
+                    <Text>No recipes found in this book.</Text>
                 ) : (
-                    savedRecipes.map((recipe) => (
+                    recipes.map((recipe) => (
 
                         <View
 
@@ -130,7 +138,9 @@ export default function RecipesListScreen() {
 
                             <Text variant="small" sx={{ mb: 's' }}>
 
-                                {recipe.description}
+                                {recipe.ingredients && recipe.ingredients.length > 0
+                                    ? '${recipe.ingredients.length} ingredients'
+                                    : 'No ingredients yet'}
 
                             </Text>
 

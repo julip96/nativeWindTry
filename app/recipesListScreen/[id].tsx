@@ -2,8 +2,9 @@ import React, { use } from 'react'
 import { View, Text, ScrollView } from 'dripsy'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Pressable } from 'react-native';
+import { Alert, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { supabase } from '@/utils/supabase';
 
 export default function RecipeDetailsScreen() {
 
@@ -15,38 +16,47 @@ export default function RecipeDetailsScreen() {
 
         const loadRecipe = async () => {
 
+            if (!id) return
+
             try {
 
-                const data = await AsyncStorage.getItem(`recipe-${id}`);
+                const { data, error }
+                    = await supabase
+                        .from('recipes')
+                        .select('*')
+                        .eq('id', id)
+                        .single()
 
-                if (data) {
+                if (error) throw error
 
-                    setRecipe(JSON.parse(data));
-
-                } else {
-
-                    setRecipe(null);
-
-                }
+                setRecipe(data)
 
             } catch (e) {
 
-                console.error('Error loading recipe:', e);
+                console.error('Error loading recipe: ', e)
+                Alert.alert('Error', 'Could not load recipe.')
 
             }
-
         }
 
-        loadRecipe();
-
-    }, [id]);
+        loadRecipe()
+    }, [id])
 
     if (!recipe) return <Text>Recipe not found</Text>
 
     const deleteRecipe = async () => {
 
-        await AsyncStorage.removeItem(`recipe-${id}`);
-        router.back();
+        try {
+
+            await supabase.from('recipes').delete().eq('id', id)
+            router.back()
+
+        } catch (e) {
+
+            console.error('Error deleting recipe')
+            Alert.alert('Error', 'Could not delete recipe')
+
+        }
 
     }
 
