@@ -46,19 +46,36 @@ export default function RecipeDetailsScreen() {
 
     const deleteRecipe = async () => {
 
-        try {
+        Alert.alert(
+            'Delete Recipe',
+            'Are you sure you want to delete this recipe?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
 
-            await supabase.from('recipes').delete().eq('id', id)
-            router.back()
 
-        } catch (e) {
+                        try {
 
-            console.error('Error deleting recipe')
-            Alert.alert('Error', 'Could not delete recipe')
+                            await supabase.from('recipes').delete().eq('id', id)
+                            router.back()
 
-        }
+                        } catch (e) {
 
+                            console.error('Error deleting recipe')
+                            Alert.alert('Error', 'Could not delete recipe')
+
+                        }
+
+
+                    }
+                }
+            ]
+        )
     }
+
 
     return (
 
@@ -111,6 +128,22 @@ export default function RecipeDetailsScreen() {
 
                 </View>
 
+            </Pressable>
+
+            <Pressable
+                onPress={() => router.replace(`./editRecipe?id=${id}`)}
+                style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}>
+                <View
+                    sx={{
+                        bg: '$secondary',
+                        p: 'm',
+                        borderRadius: 'm',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mt: 's',
+                    }}>
+                    <Text sx={{ color: 'white', fontWeight: 'bold' }}>Edit</Text>
+                </View>
             </Pressable>
 
 

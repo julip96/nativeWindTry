@@ -23,6 +23,15 @@ export default function RecipesTabLayout() {
                     title: 'Recipe Details',
                 }}
             />
+
+            <Stack.Screen
+                name="editRecipe"
+                options={{
+                    title: 'Edit Recipe',
+                }}
+
+            />
+
         </Stack>
     )
 }
