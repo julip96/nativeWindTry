@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, ScrollView, Image } from "dripsy";
-import { Pressable, Alert } from "react-native";
+import { Pressable, Alert, FlatList } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "../../utils/supabase";
-import { useEffect, useState } from 'react'
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons"
+import { Picker } from "@react-native-picker/picker"
 
 export default function NewRecipe() {
 
     const { book_id } = useLocalSearchParams()
-
     const router = useRouter()
 
     const [userId, setUserId] = useState<string | null>(null)
@@ -17,11 +17,20 @@ export default function NewRecipe() {
     const [recipe, setRecipe] = useState({
 
         title: '',
-        ingredients: '',
+        ingredients: [],
         instructions: '',
         image: ''
 
     })
+
+    const [ingredientName, setIngredientName] = useState("");
+    const [ingredientQty, setIngredientQty] = useState("");
+    const [ingredientUnit, setIngredientUnit] = useState("g");
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const units = ["g", "kg", "ml", "l", "cup", "tbsp", "tsp", "piece", "pinch", "slice"];
+
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -36,7 +45,7 @@ export default function NewRecipe() {
         fetchUser();
     }, []);
 
-    function handleChange(key: keyof typeof recipe, value: string) {
+    function handleChange(key: keyof typeof recipe, value: any) {
         setRecipe((prev) => ({ ...prev, [key]: value }));
     }
 
@@ -96,19 +105,97 @@ export default function NewRecipe() {
 
     }
 
-    // 💾 Save recipe
-    async function handleSaveRecipe() {
+    // 🧠 Fetch ingredient name suggestions
+    useEffect(() => {
+        if (ingredientName.trim().length > 1) {
+            fetchSuggestions();
+        } else {
+            setSuggestions([]);
+        }
+    }, [ingredientName]);
 
-        console.log('saving recipe...', { book_id })
+    async function fetchSuggestions() {
+        const { data, error } = await supabase
+            .from("ingredients_catalog")
+            .select("name")
+            .ilike("name", `%${ingredientName}%`)
+            .limit(5);
 
-        if (!userId || !book_id) {
-            Alert.alert('Error', 'Mising user or book info');
+        if (!error) {
+            console.warn("Error fetching suggestions:", error)
+            setShowSuggestions(false);
+        }
+        setSuggestions(data || []);
+        setShowSuggestions(true);
+    }
+
+    // ➕ Add an ingredient
+    async function handleAddIngredient() {
+        if (!ingredientName.trim()) return;
+        if (ingredientQty && isNaN(Number(ingredientQty))) {
+            Alert.alert("Invalid amount", "Please enter a number for quantity.");
             return;
         }
 
+        let ingredientId;
+
+        // Check if ingredient exists in catalog
+        const { data: existing } = await supabase
+            .from("ingredients_catalog")
+            .select("id")
+            .ilike("name", ingredientName.trim())
+            .single();
+
+        if (existing) {
+            ingredientId = existing.id;
+        } else {
+            const { data: newIng, error } = await supabase
+                .from("ingredients_catalog")
+                .insert([{ name: ingredientName.trim() }])
+                .select()
+                .single();
+
+            if (error) console.warn("Catalog insert error:", error);
+            ingredientId = newIng?.id;
+        }
+
+        const newIngredient = {
+            name: ingredientName.trim(),
+            quantity: ingredientQty ? parseFloat(ingredientQty) : null,
+            unit: ingredientUnit,
+            ingredient_id: ingredientId,
+        };
+
+        handleChange("ingredients", [...recipe.ingredients, newIngredient]);
+        setIngredientName("");
+        setIngredientQty("");
+        setIngredientUnit("g");
+        setShowSuggestions(false);
+    }
+
+    // 🗑️ Remove ingredient
+    const handleRemoveIngredient = (index: number) => {
+        handleChange(
+            "ingredients",
+            recipe.ingredients.filter((_, i) => i !== index)
+        );
+    };
+
+    // 💾 Save recipe
+    async function handleSaveRecipe() {
+
+        if (!userId || !book_id) {
+
+            Alert.alert('Error', 'Mising user or book info');
+            return;
+
+        }
+
+        const ingredientsJSON = JSON.stringify(recipe.ingredients);
+
         try {
 
-            const { data, error } = await supabase
+            const { data: recipeData, error } = await supabase
                 .from('recipes')
                 .insert([
 
@@ -118,8 +205,8 @@ export default function NewRecipe() {
                         book_id,
                         image_url: recipe.image,
                         title: recipe.title,
-                        ingredients: recipe.ingredients,
                         instructions: recipe.instructions,
+                        ingredients: ingredientsJSON,
                         rating: 0,
                         private: true,
 
@@ -127,10 +214,19 @@ export default function NewRecipe() {
 
                 ])
                 .select()
+                .single();
 
             if (error) throw error
 
-
+            // Save ingredients to linking table
+            await supabase.from("recipe_ingredients").insert(
+                recipe.ingredients.map((ing) => ({
+                    recipe_id: recipeData.id,
+                    ingredient_id: ing.ingredient_id,
+                    quantity: ing.quantity,
+                    unit: ing.unit,
+                }))
+            );
 
             Alert.alert('Success, Recipe saved!');
             router.back()
@@ -273,15 +369,102 @@ export default function NewRecipe() {
 
                 ) : null}
 
-                <TextInput
+                {/* 🧂 Ingredients */}
+                <Text variant="subheading" sx={{ mb: "s" }}>
+                    Ingredients
+                </Text>
 
-                    sx={{ bg: "$background", mb: "s" }}
-                    placeholder="Ingredients"
-                    multiline
-                    value={recipe.ingredients}
-                    onChangeText={(text) => handleChange("ingredients", text)}
+                <View sx={{ flexDirection: "row", gap: 8, mb: "s", alignItems: "center" }}>
+                    <View sx={{ flex: 1 }}>
+                        <TextInput
+                            placeholder="Name"
+                            value={ingredientName}
+                            onChangeText={setIngredientName}
+                            sx={{
+                                borderWidth: 1,
+                                borderColor: "$border",
+                                p: "s",
+                                borderRadius: "m",
+                                bg: "$muted",
+                            }}
+                        />
+                        {showSuggestions && suggestions.length > 0 && (
+                            <View sx={{ bg: "white", borderRadius: "m", mt: 2 }}>
+                                {suggestions.map((s, idx) => (
+                                    <Pressable
+                                        key={idx}
+                                        onPress={() => {
+                                            setIngredientName(s.name);
+                                            setShowSuggestions(false);
+                                        }}
+                                    >
+                                        <Text sx={{ p: "s" }}>{s.name}</Text>
+                                    </Pressable>
+                                ))}
+                            </View>
+                        )}
+                    </View>
 
-                />
+                    <TextInput
+                        placeholder="Qty"
+                        value={ingredientQty}
+                        onChangeText={(t) => setIngredientQty(t.replace(/[^0-9.]/g, ""))}
+                        keyboardType="numeric"
+                        sx={{
+                            width: 70,
+                            borderWidth: 1,
+                            borderColor: "$border",
+                            p: "s",
+                            borderRadius: "m",
+                            bg: "$muted",
+                        }}
+                    />
+
+                    <View
+                        sx={{
+                            borderWidth: 1,
+                            borderColor: "$border",
+                            borderRadius: "m",
+                            overflow: "hidden",
+                            bg: "$muted",
+                            width: 90,
+                        }}
+                    >
+                        <Picker selectedValue={ingredientUnit} onValueChange={setIngredientUnit} style={{ height: 40 }}>
+                            {units.map((u) => (
+                                <Picker.Item key={u} label={u} value={u} />
+                            ))}
+                        </Picker>
+                    </View>
+
+                    <Pressable onPress={handleAddIngredient}>
+                        <Ionicons name="add-circle" size={32} color="#2e8b57" />
+                    </Pressable>
+                </View>
+
+                {recipe.ingredients.length > 0 && (
+                    <View sx={{ mb: "l" }}>
+                        {recipe.ingredients.map((ing: any, index: number) => (
+                            <View
+                                key={index}
+                                sx={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    bg: "$muted",
+                                    p: "s",
+                                    borderRadius: "m",
+                                    mb: "xs",
+                                }}
+                            >
+                                <Text>{`${ing.name} — ${ing.quantity || ""} ${ing.unit}`}</Text>
+                                <Pressable onPress={() => handleRemoveIngredient(index)}>
+                                    <Ionicons name="trash-outline" size={22} color="red" />
+                                </Pressable>
+                            </View>
+                        ))}
+                    </View>
+                )}
 
                 <TextInput
 
