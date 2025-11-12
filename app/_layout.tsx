@@ -46,7 +46,7 @@ export default function RootLayout() {
 
   const tabs = [
 
-    { name: 'index', label: 'Home', path: '/' },
+    { name: 'recipeBooks', label: 'Books', path: '/recipeBooks' },
     { name: 'recipesListScreen', label: 'Recipes', path: '/recipesListScreen' },
     { name: 'settings', label: 'Settings', path: '/settings' },
 

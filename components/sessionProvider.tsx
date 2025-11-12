@@ -18,6 +18,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
             setSession(session)
         })
 
+        // try to see if i can track user id
+        console.log(session?.user.id);
+
         return () => {
             subscription.subscription.unsubscribe()
         }
@@ -32,4 +35,5 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
 export function useSession() {
     return useContext(SessionContext)
+
 }
