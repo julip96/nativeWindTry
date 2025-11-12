@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Alert, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '@/utils/supabase';
+import { Image } from 'react-native';
 
 export default function RecipeDetailsScreen() {
 
@@ -76,6 +77,10 @@ export default function RecipeDetailsScreen() {
         )
     }
 
+    const ingredients =
+        typeof recipe.ingredients === 'string'
+            ? JSON.parse(recipe.ingredients)
+            : recipe.ingredients
 
     return (
 
@@ -89,13 +94,60 @@ export default function RecipeDetailsScreen() {
 
                 </Text>
 
+                {recipe.image_url ? (
+                    <Image
+                        source={{ uri: recipe.image_url }}
+                        style={{
+                            width: '100%',
+                            height: 200,
+                            borderRadius: 12,
+                            marginBottom: 16,
+                        }}
+                        resizeMode="cover"
+                    />
+                ) : null}
+
+
+
                 <Text variant="heading" sx={{ mb: 'm' }}>
 
                     Ingredients:
 
                 </Text>
 
-                <Text variant="body">{recipe.ingredients}</Text>
+                {ingredients && ingredients.length > 0 ? (
+                    ingredients.map((item: any, index: number) => (
+                        <View
+                            key={index}
+                            sx={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                bg: '$muted',
+                                p: 's',
+                                mb: 'xs',
+                                borderRadius: 'm',
+                            }}
+                        >
+                            {/* Amount */}
+                            <Text sx={{ width: 60, textAlign: 'left', fontWeight: 'bold' }}>
+                                {item.quantity ?? item.amount ?? '-'}
+                            </Text>
+
+                            {/* Unit */}
+                            <Text sx={{ width: 60, textAlign: 'center' }}>
+                                {item.unit ?? ''}
+                            </Text>
+
+                            {/* Name */}
+                            <Text sx={{ flex: 1, textAlign: 'left' }}>
+                                {item.name ?? ''}
+                            </Text>
+                        </View>
+                    ))
+                ) : (
+                    <Text variant="body">No ingredients found.</Text>
+                )}
+
 
                 <Text variant="heading" sx={{ mb: 'm' }}>
 

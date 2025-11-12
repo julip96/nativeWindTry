@@ -2,10 +2,11 @@ import React from 'react'
 import { Platform, Pressable } from 'react-native'
 import { View, Text, ScrollView } from 'dripsy'
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '../../utils/supabase'
+import { Image } from 'react-native';
+
 
 export default function RecipesListScreen() {
 
@@ -136,13 +137,20 @@ export default function RecipesListScreen() {
 
                             <Text variant="heading">{recipe.title}</Text>
 
-                            <Text variant="small" sx={{ mb: 's' }}>
+                            {recipe.image_url ? (
+                                <Image
+                                    source={{ uri: recipe.image_url }}
+                                    style={{
+                                        width: '100%',
+                                        height: 120,
+                                        borderRadius: 10,
+                                        marginBottom: 8,
+                                        marginTop: 4,
+                                    }}
+                                    resizeMode="cover"
+                                />
+                            ) : null}
 
-                                {recipe.ingredients && recipe.ingredients.length > 0
-                                    ? '${recipe.ingredients.length} ingredients'
-                                    : 'No ingredients yet'}
-
-                            </Text>
 
                             <Pressable
 

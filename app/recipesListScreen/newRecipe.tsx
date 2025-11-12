@@ -29,8 +29,7 @@ export default function NewRecipe() {
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-    const units = ["g", "kg", "ml", "l", "cup", "tbsp", "tsp", "piece", "pinch", "slice"];
-
+    const units = ["-", "g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"];
 
     useEffect(() => {
         const fetchUser = async () => {
