@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, ScrollView, Image } from "dripsy";
-import { Pressable, Alert, FlatList } from "react-native";
+import { Pressable, Alert, FlatList, Modal, View as RNView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "../../utils/supabase";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"
 import { Picker } from "@react-native-picker/picker"
+import Entypo from '@expo/vector-icons/Entypo';
+import { TouchableOpacity } from "react-native";
+import PhotoPickerBox from '../../components/PhotoPickerBox'
+import IngredientCard from "../../components/IngredientCard";
 
 export default function NewRecipe() {
 
@@ -23,11 +27,14 @@ export default function NewRecipe() {
 
     })
 
+    const [unitModalVisible, setUnitModalVisible] = useState(false);
+
     const [ingredientName, setIngredientName] = useState("");
     const [ingredientQty, setIngredientQty] = useState("");
     const [ingredientUnit, setIngredientUnit] = useState("g");
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null)
 
     const units = ["-", "g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"];
 
@@ -46,62 +53,6 @@ export default function NewRecipe() {
 
     function handleChange(key: keyof typeof recipe, value: any) {
         setRecipe((prev) => ({ ...prev, [key]: value }));
-    }
-
-    // 📷 Pick image from gallery
-    async function handlePickImage() {
-
-        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-        if (!permissionResult.granted) {
-
-            Alert.alert("Permission required", "We need access to your photos!");
-            return;
-
-        }
-
-        const result = await ImagePicker.launchImageLibraryAsync({
-
-            mediaTypes: ImagePicker.MediaTypeOptions.Images, // deprecated, replace
-            allowsEditing: true,
-            quality: 0.8,
-
-        });
-
-        if (!result.canceled && result.assets.length > 0) {
-
-            handleChange("image", result.assets[0].uri);
-
-        }
-
-    }
-
-    // 📸 Take photo with camera
-    async function handleTakePhoto() {
-
-        const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
-        if (!permissionResult.granted) {
-
-            Alert.alert("Permission required", "We need access to your camera!");
-            return;
-
-        }
-
-        const result = await ImagePicker.launchCameraAsync({
-
-            mediaTypes: ImagePicker.MediaTypeOptions.Images, // deprecated, replace
-            allowsEditing: true,
-            quality: 0.8,
-
-        });
-
-        if (!result.canceled && result.assets.length > 0) {
-
-            handleChange("image", result.assets[0].uri);
-
-        }
-
     }
 
     // 🧠 Fetch ingredient name suggestions
@@ -165,7 +116,17 @@ export default function NewRecipe() {
             ingredient_id: ingredientId,
         };
 
-        handleChange("ingredients", [...recipe.ingredients, newIngredient]);
+        // ✅ CHANGES FOR EDIT MODE
+        if (editingIndex !== null) {
+            const newIngredients = [...recipe.ingredients];
+            newIngredients[editingIndex] = newIngredient;
+            handleChange("ingredients", newIngredients);
+            setEditingIndex(null); // reset edit mode
+        } else {
+            handleChange("ingredients", [...recipe.ingredients, newIngredient]);
+        }
+
+        // reset composer inputs
         setIngredientName("");
         setIngredientQty("");
         setIngredientUnit("g");
@@ -271,124 +232,62 @@ export default function NewRecipe() {
                 />
 
                 {/* 📸 Select or Take Photo buttons */}
-                <View sx={{ flexDirection: "row", justifyContent: "space-between" }}>
 
-                    <Pressable
+                <PhotoPickerBox
+                    onChange={(uri) => setRecipe((r) => ({ ...r, image: uri }))}
+                />
 
-                        android_ripple={{ color: "#ccc" }}
-                        onPress={handlePickImage}
-                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
 
-                    >
-                        <View
 
-                            sx={{
-
-                                bg: "$secondary",
-                                p: "m",
-                                borderRadius: "m",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                mt: "s",
-                                width: 150,
-
-                            }}
-
-                        >
-
-                            <Text sx={{ color: "white", fontWeight: "bold" }}>From Gallery</Text>
-
-                        </View>
-
-                    </Pressable>
-
-                    <Pressable
-
-                        android_ripple={{ color: "#ccc" }}
-                        onPress={handleTakePhoto}
-                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-
-                    >
-                        <View
-
-                            sx={{
-
-                                bg: "$primary",
-                                p: "m",
-                                borderRadius: "m",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                mt: "s",
-                                width: 150,
-
-                            }}
-
-                        >
-
-                            <Text sx={{ color: "white", fontWeight: "bold" }}>Take Photo</Text>
-
-                        </View>
-
-                    </Pressable>
-
-                </View>
-
-                {/* ✅ Preview selected image */}
-                {recipe.image ? (
-
-                    <View
-
-                        sx={{
-
-                            alignItems: "center",
-                            justifyContent: "center",
-                            mt: "m",
-                            mb: "m",
-
-                        }}
-
-                    >
-
-                        <Image
-
-                            source={{ uri: recipe.image }}
-
-                            style={{
-
-                                width: 200,
-                                height: 200,
-                                borderRadius: 10,
-                                resizeMode: "cover",
-
-                            }}
-
-                        />
-
-                    </View>
-
-                ) : null}
 
                 {/* 🧂 Ingredients */}
                 <Text variant="subheading" sx={{ mb: "s" }}>
                     Ingredients
                 </Text>
 
-                <View sx={{ flexDirection: "row", gap: 8, mb: "s", alignItems: "center" }}>
+                {/* ---------- Ingredient composer (polished) ---------- */}
+                <View
+                    sx={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        bg: "white",
+                        borderWidth: 1,
+                        borderColor: "$border",
+                        borderRadius: "l",
+                        padding: "s",
+                        mb: "m",
+                        gap: 8,
+                    }}
+                >
+                    {/* Name */}
                     <View sx={{ flex: 1 }}>
                         <TextInput
-                            placeholder="Name"
+                            placeholder="Ingredient"
                             value={ingredientName}
                             onChangeText={setIngredientName}
                             sx={{
                                 borderWidth: 1,
                                 borderColor: "$border",
-                                p: "s",
                                 borderRadius: "m",
+                                px: "s",
+                                py: 10,
                                 bg: "$muted",
                             }}
                         />
                         {showSuggestions && suggestions.length > 0 && (
-                            <View sx={{ bg: "white", borderRadius: "m", mt: 2 }}>
+                            <View
+                                sx={{
+                                    position: "absolute",
+                                    top: 48,
+                                    left: 0,
+                                    right: 0,
+                                    bg: "white",
+                                    borderRadius: "m",
+                                    borderWidth: 1,
+                                    borderColor: "$border",
+                                    zIndex: 50,
+                                }}
+                            >
                                 {suggestions.map((s, idx) => (
                                     <Pressable
                                         key={idx}
@@ -396,6 +295,7 @@ export default function NewRecipe() {
                                             setIngredientName(s.name);
                                             setShowSuggestions(false);
                                         }}
+                                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
                                     >
                                         <Text sx={{ p: "s" }}>{s.name}</Text>
                                     </Pressable>
@@ -404,65 +304,166 @@ export default function NewRecipe() {
                         )}
                     </View>
 
+                    {/* Qty */}
                     <TextInput
                         placeholder="Qty"
                         value={ingredientQty}
                         onChangeText={(t) => setIngredientQty(t.replace(/[^0-9.]/g, ""))}
                         keyboardType="numeric"
                         sx={{
-                            width: 70,
+                            width: 60,
                             borderWidth: 1,
                             borderColor: "$border",
-                            p: "s",
                             borderRadius: "m",
+                            px: "s",
+                            py: 10,
                             bg: "$muted",
+                            textAlign: "center",
                         }}
                     />
 
-                    <View
-                        sx={{
-                            borderWidth: 1,
-                            borderColor: "$border",
-                            borderRadius: "m",
-                            overflow: "hidden",
-                            bg: "$muted",
-                            width: 90,
-                        }}
+                    {/* Unit trigger */}
+                    <Pressable
+                        onPress={() => setUnitModalVisible(true)}
+                        style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
                     >
-                        <Picker selectedValue={ingredientUnit} onValueChange={setIngredientUnit} style={{ height: 40 }}>
-                            {units.map((u) => (
-                                <Picker.Item key={u} label={u} value={u} />
-                            ))}
-                        </Picker>
-                    </View>
+                        <View
+                            sx={{
+                                width: 70,
+                                borderWidth: 1,
+                                borderColor: "$border",
+                                borderRadius: "m",
+                                bg: "$muted",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                height: 46,
+                                px: "s",
+                                flexDirection: "row",
+                                gap: 6,
+                            }}
+                        >
+                            <Text sx={{ fontWeight: "600" }}>{ingredientUnit}</Text>
+                            <Entypo name="chevron-down" size={16} color="#666" />
+                        </View>
+                    </Pressable>
 
-                    <Pressable onPress={handleAddIngredient}>
-                        <Ionicons name="add-circle" size={32} color="#2e8b57" />
+                    {/* Add button */}
+                    <Pressable
+                        onPress={handleAddIngredient}
+                        style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                    >
+                        <View
+                            sx={{
+                                width: 44,
+                                height: 44,
+                                backgroundColor: editingIndex !== null ? "#007bff" : "#28a745",
+                                borderRadius: 999,
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}
+                        >
+                            <Entypo
+                                name={editingIndex !== null ? "pencil" : "plus"}
+                                size={20}
+                                color={"white"}  // blue for update, green for add
+                            />
+
+                        </View>
                     </Pressable>
                 </View>
 
+                {/* ---------- Unit modal (bottom sheet) ---------- */}
+                <Modal
+                    visible={unitModalVisible}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={() => setUnitModalVisible(false)}
+                >
+                    {/* backdrop: close when tapped */}
+                    <Pressable
+                        onPress={() => setUnitModalVisible(false)}
+                        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.35)" }}
+                    />
+
+                    {/* sheet */}
+                    <RNView
+                        style={{
+                            position: "absolute",
+                            left: 12,
+                            right: 12,
+                            bottom: 18,
+                            borderRadius: 12,
+                            overflow: "hidden",
+                            backgroundColor: "white",
+                            maxHeight: 320,
+                            borderWidth: 1,
+                            borderColor: "#eee",
+                        }}
+                    >
+                        <View
+                            sx={{
+                                px: "m",
+                                py: "s",
+                                borderBottomWidth: 1,
+                                borderBottomColor: "$border",
+                                alignItems: "center",
+                            }}
+                        >
+                            <View
+                                style={{
+                                    width: 36,
+                                    height: 4,
+                                    borderRadius: 2,
+                                    backgroundColor: "#ddd",
+                                }}
+                            />
+                        </View>
+
+                        <FlatList
+                            data={units}
+                            keyExtractor={(i) => i}
+                            renderItem={({ item }) => (
+                                <Pressable
+                                    onPress={() => {
+                                        setIngredientUnit(item);
+                                        setUnitModalVisible(false);
+                                    }}
+                                    style={({ pressed }) => [
+                                        { paddingVertical: 14, paddingHorizontal: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+                                        pressed && { opacity: 0.6 },
+                                    ]}
+                                >
+                                    <Text style={{ fontSize: 16 }}>{item}</Text>
+                                    {item === ingredientUnit ? <Text style={{ color: "#2e8b57", fontWeight: 700 }}>✓</Text> : null}
+                                </Pressable>
+                            )}
+                            ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: "#f3f3f3" }} />}
+                        />
+                    </RNView>
+                </Modal>
+
+
+
+
                 {recipe.ingredients.length > 0 && (
                     <View sx={{ mb: "l" }}>
-                        {recipe.ingredients.map((ing: any, index: number) => (
-                            <View
+                        {recipe.ingredients.map((ing, index) => (
+                            <IngredientCard
                                 key={index}
-                                sx={{
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    bg: "$muted",
-                                    p: "s",
-                                    borderRadius: "m",
-                                    mb: "xs",
+                                ingredient={ing}
+                                isEditing={editingIndex === index}
+                                onRemove={() => handleRemoveIngredient(index)}
+                                onEdit={() => {
+                                    setIngredientName(ing.name);
+                                    setIngredientQty(ing.quantity?.toString() || "");
+                                    setIngredientUnit(ing.unit);
+                                    setEditingIndex(index)
                                 }}
-                            >
-                                <Text>{`${ing.name} — ${ing.quantity || ""} ${ing.unit}`}</Text>
-                                <Pressable onPress={() => handleRemoveIngredient(index)}>
-                                    <Ionicons name="trash-outline" size={22} color="red" />
-                                </Pressable>
-                            </View>
+                            />
                         ))}
+
                     </View>
+
                 )}
 
                 <TextInput

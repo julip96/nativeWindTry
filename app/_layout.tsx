@@ -11,6 +11,7 @@ import { supabase } from '../utils/supabase'
 import Auth from '../components/Auth'
 import { Session } from '@supabase/supabase-js'
 import { SessionProvider } from '../components/SessionProvider'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 export default function RootLayout() {
 
@@ -82,185 +83,189 @@ export default function RootLayout() {
 
       <SafeAreaProvider>
 
-        <SessionProvider>
-          {Platform.OS === 'ios' ? (
-            /*
-            <SafeAreaView style={{ flex: 1 }}>
-              <NativeTabs>
-                <NativeTabs.Trigger name="index">
-                  <Icon sf="house.fill" />
-                  <Label>Home</Label>
-                </NativeTabs.Trigger>
-  
-                <NativeTabs.Trigger name="recipesListScreen">
-                  <Icon sf="fork.knife" />
-                  <Label>Recipes</Label>
-                </NativeTabs.Trigger>
-  
-                <NativeTabs.Trigger name="settings">
-                  <Icon sf="gear" />
-                  <Label>Settings</Label>
-                </NativeTabs.Trigger>
-              </NativeTabs>
-            </SafeAreaView> */
+        <GestureHandlerRootView style={{ flex: 1 }}>
 
-            <SafeAreaView style={{ flex: 1 }}>
-              {/* Active screen */}
+          <SessionProvider>
+            {Platform.OS === 'ios' ? (
+              /*
+              <SafeAreaView style={{ flex: 1 }}>
+                <NativeTabs>
+                  <NativeTabs.Trigger name="index">
+                    <Icon sf="house.fill" />
+                    <Label>Home</Label>
+                  </NativeTabs.Trigger>
+    
+                  <NativeTabs.Trigger name="recipesListScreen">
+                    <Icon sf="fork.knife" />
+                    <Label>Recipes</Label>
+                  </NativeTabs.Trigger>
+    
+                  <NativeTabs.Trigger name="settings">
+                    <Icon sf="gear" />
+                    <Label>Settings</Label>
+                  </NativeTabs.Trigger>
+                </NativeTabs>
+              </SafeAreaView> */
 
-              <View sx={{ flex: 1 }}>
+              <SafeAreaView style={{ flex: 1 }}>
+                {/* Active screen */}
 
-                <Slot />
+                <View sx={{ flex: 1 }}>
 
-              </View>
+                  <Slot />
 
-              {/* Bottom tab bar */}
-              <View
+                </View>
 
-                sx={{
+                {/* Bottom tab bar */}
+                <View
 
-                  height: 60,
-                  flexDirection: 'row',
-                  borderTopWidth: 1,
-                  borderColor: '$border',
-                  backgroundColor: '$background',
+                  sx={{
 
-                }}
+                    height: 60,
+                    flexDirection: 'row',
+                    borderTopWidth: 1,
+                    borderColor: '$border',
+                    backgroundColor: '$background',
 
-              >
+                  }}
 
-                {tabs.map((tab) => {
+                >
 
-                  const isActive = activeRoute === tab.name
+                  {tabs.map((tab) => {
 
-                  return (
+                    const isActive = activeRoute === tab.name
 
-                    <Pressable
+                    return (
 
-                      key={tab.name}
+                      <Pressable
 
-                      sx={{
-
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        backgroundColor: isActive ? '$primary' : '$background',
-
-                      }}
-
-                      onPress={() => {
-
-                        if (!isActive) router.push(tab.path)
-
-                      }}
-
-                    >
-
-                      <Text
+                        key={tab.name}
 
                         sx={{
 
-                          color: isActive ? '$textOnPrimary' : '$text',
-                          fontWeight: isActive ? '600' : '400',
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: isActive ? '$primary' : '$background',
+
+                        }}
+
+                        onPress={() => {
+
+                          if (!isActive) router.push(tab.path)
 
                         }}
 
                       >
 
-                        {tab.label}
+                        <Text
 
-                      </Text>
+                          sx={{
 
-                    </Pressable>
+                            color: isActive ? '$textOnPrimary' : '$text',
+                            fontWeight: isActive ? '600' : '400',
 
-                  )
+                          }}
 
-                })}
+                        >
 
-              </View>
+                          {tab.label}
 
-            </SafeAreaView>
+                        </Text>
 
-          ) : (
+                      </Pressable>
 
-            <SafeAreaView style={{ flex: 1 }}>
+                    )
 
-              {/* Active screen */}
-              <View sx={{ flex: 1 }}>
+                  })}
 
-                <Slot />
+                </View>
 
-              </View>
+              </SafeAreaView>
 
-              {/* Bottom tab bar */}
-              <View
+            ) : (
 
-                sx={{
+              <SafeAreaView style={{ flex: 1 }}>
 
-                  height: 60,
-                  flexDirection: 'row',
-                  borderTopWidth: 1,
-                  borderColor: '$border',
-                  backgroundColor: '$background',
+                {/* Active screen */}
+                <View sx={{ flex: 1 }}>
 
-                }}
+                  <Slot />
 
-              >
+                </View>
 
-                {tabs.map((tab) => {
+                {/* Bottom tab bar */}
+                <View
 
-                  const isActive = activeRoute === tab.name
+                  sx={{
 
-                  return (
+                    height: 60,
+                    flexDirection: 'row',
+                    borderTopWidth: 1,
+                    borderColor: '$border',
+                    backgroundColor: '$background',
 
-                    <Pressable
+                  }}
 
-                      key={tab.name}
+                >
 
-                      sx={{
+                  {tabs.map((tab) => {
 
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        backgroundColor: isActive ? '$primary' : '$background',
+                    const isActive = activeRoute === tab.name
 
-                      }}
+                    return (
 
-                      onPress={() => {
+                      <Pressable
 
-                        if (!isActive) router.push(tab.path)
-
-                      }}
-
-                    >
-
-                      <Text
+                        key={tab.name}
 
                         sx={{
 
-                          color: isActive ? '$textOnPrimary' : '$text',
-                          fontWeight: isActive ? '600' : '400',
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: isActive ? '$primary' : '$background',
+
+                        }}
+
+                        onPress={() => {
+
+                          if (!isActive) router.push(tab.path)
 
                         }}
 
                       >
 
-                        {tab.label}
+                        <Text
 
-                      </Text>
+                          sx={{
 
-                    </Pressable>
+                            color: isActive ? '$textOnPrimary' : '$text',
+                            fontWeight: isActive ? '600' : '400',
 
-                  )
+                          }}
 
-                })}
+                        >
 
-              </View>
+                          {tab.label}
 
-            </SafeAreaView>
+                        </Text>
 
-          )}
+                      </Pressable>
 
-        </SessionProvider>
+                    )
+
+                  })}
+
+                </View>
+
+              </SafeAreaView>
+
+            )}
+
+          </SessionProvider>
+
+        </GestureHandlerRootView>
 
       </SafeAreaProvider>
 
