@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, ScrollView, Image } from "dripsy";
 import { Pressable, Alert, FlatList, Modal, View as RNView } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { supabase } from "../../utils/supabase";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"
 import { Picker } from "@react-native-picker/picker"
 import Entypo from '@expo/vector-icons/Entypo';
-import { TouchableOpacity } from "react-native";
 import PhotoPickerBox from '../../components/PhotoPickerBox'
 import IngredientCard from "../../components/IngredientCard";
+import IngredientEditorModal from "../../components/IngredientEditorModal";
 
 export default function NewRecipe() {
 
@@ -35,6 +34,11 @@ export default function NewRecipe() {
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null)
+
+    const [editorVisible, setEditorVisible] = useState(false);
+    const [editorIndex, setEditorIndex] = useState<number | null>(null);
+    const [editorInitial, setEditorInitial] = useState<any>({ name: "", quantity: null, unit: "g" });
+
 
     const units = ["-", "g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"];
 
@@ -140,6 +144,15 @@ export default function NewRecipe() {
             recipe.ingredients.filter((_, i) => i !== index)
         );
     };
+
+    function handleSaveFromModal(updatedIngredient: any, index: number) {
+        const newIngredients = [...recipe.ingredients];
+        newIngredients[index] = updatedIngredient;
+        handleChange("ingredients", newIngredients);
+        setEditorVisible(false);
+        setEditorIndex(null);
+    }
+
 
     // 💾 Save recipe
     async function handleSaveRecipe() {
@@ -451,14 +464,19 @@ export default function NewRecipe() {
                             <IngredientCard
                                 key={index}
                                 ingredient={ing}
-                                isEditing={editingIndex === index}
+                                isEditing={editingIndex === index && editorVisible}
                                 onRemove={() => handleRemoveIngredient(index)}
                                 onEdit={() => {
-                                    setIngredientName(ing.name);
-                                    setIngredientQty(ing.quantity?.toString() || "");
-                                    setIngredientUnit(ing.unit);
-                                    setEditingIndex(index)
+                                    setEditorIndex(index);
+                                    setEditorInitial({
+                                        name: ing.name,
+                                        quantity: ing.quantity ?? null,
+                                        unit: ing.unit ?? "g",
+                                        ingredient_id: ing.ingredient_id,
+                                    });
+                                    setEditorVisible(true);
                                 }}
+
                             />
                         ))}
 
@@ -506,6 +524,21 @@ export default function NewRecipe() {
                 </Pressable>
 
             </View>
+
+            <IngredientEditorModal
+                visible={editorVisible}
+                index={editorIndex ?? 0}
+                initial={editorInitial}
+                units={units}
+                onClose={() => {
+                    setEditorVisible(false);
+                    setEditorIndex(null);
+                }}
+                onSave={(updated, idx) => {
+                    handleSaveFromModal(updated, idx);
+                }}
+            />
+
 
         </ScrollView>
 
