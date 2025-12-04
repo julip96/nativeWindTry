@@ -6,17 +6,23 @@ import { supabase } from "@/utils/supabase";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import PhotoPickerBox from "@/components/PhotoPickerBox";
 
 export default function EditRecipeScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
 
+    /* CHANGED START */
+    // ingredients now uses `amount` instead of `quantity` to match DB
+    const [ingredients, setIngredients] = useState<
+        { amount: string; unit: string; name: string }[]
+    >([]);
+    /* CHANGED END */
+
     const [title, setTitle] = useState("");
     const [instructions, setInstructions] = useState("");
-    const [image, setImage] = useState("");
-    const [ingredients, setIngredients] = useState<
-        { quantity: string; unit: string; name: string }[]
-    >([]);
+    const [image, setImage] = useState<string | null>(null);
+
 
     useEffect(() => {
         const loadRecipe = async () => {
@@ -43,7 +49,7 @@ export default function EditRecipeScreen() {
                     if (Array.isArray(parsedIngredients)) {
                         setIngredients(
                             parsedIngredients.map((ing) => ({
-                                quantity: ing.quantity ?? "",
+                                amount: ing.amount ?? "",
                                 unit: ing.unit ?? "",
                                 name: ing.name ?? "",
                             }))
@@ -67,19 +73,18 @@ export default function EditRecipeScreen() {
 
     // 🧾 Add a new ingredient
     const handleAddIngredient = () => {
-        setIngredients([...ingredients, { quantity: "", unit: "", name: "" }]);
+        setIngredients([...ingredients, { amount: "", unit: "", name: "" }]);
     };
 
     // 🧹 Remove ingredient
     const handleRemoveIngredient = (index: number) => {
-        const updated = ingredients.filter((_, i) => i !== index);
-        setIngredients(updated);
+        setIngredients((prev) => prev.filter((_, i) => i !== index));
     };
 
     // ✏️ Update ingredient field
     const handleIngredientChange = (
         index: number,
-        field: "quantity" | "unit" | "name",
+        field: "amount" | "unit" | "name",
         value: string
     ) => {
         const updated = [...ingredients];
@@ -164,63 +169,11 @@ export default function EditRecipeScreen() {
                     onChangeText={setTitle}
                 />
 
-                {/* 📸 Image Buttons */}
-                <View sx={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    <Pressable
-                        android_ripple={{ color: "#ccc" }}
-                        onPress={handlePickImage}
-                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-                    >
-                        <View
-                            sx={{
-                                bg: "$secondary",
-                                p: "m",
-                                borderRadius: "m",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                mt: "s",
-                                width: 150,
-                            }}
-                        >
-                            <Text sx={{ color: "white", fontWeight: "bold" }}>From Gallery</Text>
-                        </View>
-                    </Pressable>
-
-                    <Pressable
-                        android_ripple={{ color: "#ccc" }}
-                        onPress={handleTakePhoto}
-                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-                    >
-                        <View
-                            sx={{
-                                bg: "$primary",
-                                p: "m",
-                                borderRadius: "m",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                mt: "s",
-                                width: 150,
-                            }}
-                        >
-                            <Text sx={{ color: "white", fontWeight: "bold" }}>Take Photo</Text>
-                        </View>
-                    </Pressable>
-                </View>
-
-                {/* ✅ Preview selected image */}
-                {image ? (
-                    <View sx={{ alignItems: "center", mt: "m", mb: "m" }}>
-                        <Image
-                            source={{ uri: image }}
-                            style={{
-                                width: 200,
-                                height: 200,
-                                borderRadius: 10,
-                                resizeMode: "cover",
-                            }}
-                        />
-                    </View>
-                ) : null}
+                <PhotoPickerBox
+                    onChange={(uri) => {
+                        setImage(uri);
+                    }}
+                />
 
                 {/* 🧂 Ingredients */}
                 <Text sx={{ fontWeight: "bold", mt: "m", mb: "s" }}>Ingredients</Text>
@@ -248,12 +201,11 @@ export default function EditRecipeScreen() {
                                 textAlign: "center",
                             }}
                             placeholder="Amt"
-                            value={item.quantity ? String(item.quantity) : ""}
+                            value={item.amount ? String(item.amount) : ""}
                             keyboardType="numeric"
-                            onChangeText={(text) => handleIngredientChange(index, "quantity", text)}
+                            onChangeText={(text) => handleIngredientChange(index, "amount", text)}
                         />
 
-                        {/* Unit Picker */}
                         {/* Unit Picker */}
                         <View
                             sx={{
