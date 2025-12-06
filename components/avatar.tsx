@@ -181,6 +181,7 @@ const styles = StyleSheet.create({
 
         objectFit: 'cover',
         paddingTop: 0,
+        justifyContent: 'center',
 
     },
 

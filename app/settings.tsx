@@ -1,64 +1,95 @@
 import React from 'react'
-import { View, Text, H1, ScrollView } from 'dripsy'
-import { Switch } from 'react-native'
+import { View, Text, H1, ScrollView, Pressable } from 'dripsy'
 import { StatusBar } from 'expo-status-bar'
-import { useThemeMode } from '../components/ThemeProvider'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Account from '../components/Account'
+import { useThemeMode } from '../components/ThemeProvider'
 import { useSession } from '@/components/SessionProvider'
+import Account from '../components/Account'
 
 export default function SettingsScreen() {
-
     const session = useSession()
-
     const { mode, setMode } = useThemeMode()
 
-    const isStandard = mode === 'standard'
-    const isPink = mode === 'pink'
-
     return (
-
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#fffaf0' }}>
-
+        <SafeAreaView style={{ flex: 1 }}>
             <ScrollView>
 
+                {/* ---------- Profile Card ---------- */}
                 <View
                     sx={{
                         backgroundColor: '$background',
-                        padding: 20,
-                        margin: 5,
-                        flex: 1,
-                        marginTop: 25,
-                        marginBottom: 50,
-                        borderRadius: 5,
+                        borderRadius: 20,
+                        padding: 24,
+                        margin: 16,
+                        alignItems: 'center',
+                        shadowColor: '#000',
+                        shadowOpacity: 0.05,
+                        shadowRadius: 10,
                     }}
                 >
-                    <H1 sx={{ color: '$text', fontSize: 20, marginTop: 20 }}>Settings</H1>
+                    <Account session={session.session} mode="header" />
 
-                    <Text sx={{ color: '$text', fontSize: 20, marginTop: 20 }}>Color Mode</Text>
-
-                    <View sx={{ flexDirection: 'row', alignItems: 'center', mt: 'm' }}>
-                        <Text sx={{ color: '$text', mr: 'm' }}>Standard</Text>
-                        <Switch
-                            value={isStandard}
-                            onValueChange={() => setMode('standard')}
-                        />
-                    </View>
-
-                    <View sx={{ flexDirection: 'row', alignItems: 'center', mt: 's' }}>
-                        <Text sx={{ color: '$text', mr: 'm' }}>Pink</Text>
-                        <Switch
-                            value={isPink}
-                            onValueChange={() => setMode('pink')}
-                        />
-                    </View>
-
-                    <Account session={session.session} />
-
-                    <StatusBar style="dark" />
                 </View>
+
+                {/* ---------- Theme Card ---------- */}
+                <View
+                    sx={{
+                        backgroundColor: '$background',
+                        borderRadius: 20,
+                        padding: 24,
+                        marginHorizontal: 16,
+                        marginTop: 8,
+                        shadowColor: '#000',
+                        shadowOpacity: 0.05,
+                        shadowRadius: 10,
+                    }}
+                >
+                    <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>Color Mode</H1>
+
+                    {/* Segmented Control */}
+                    <View
+                        sx={{
+                            flexDirection: 'row',
+                            backgroundColor: '$mutedBackground',
+                            borderRadius: 12,
+                            padding: 4,
+                        }}
+                    >
+                        <Pressable
+                            onPress={() => setMode('standard')}
+                            sx={{
+                                flex: 1,
+                                paddingY: 10,
+                                borderRadius: 10,
+                                alignItems: 'center',
+                                backgroundColor: mode === 'standard' ? '$primary' : 'transparent',
+                            }}
+                        >
+                            <Text sx={{ color: mode === 'standard' ? 'white' : '$text' }}>
+                                Standard
+                            </Text>
+                        </Pressable>
+
+                        <Pressable
+                            onPress={() => setMode('pink')}
+                            sx={{
+                                flex: 1,
+                                paddingY: 10,
+                                borderRadius: 10,
+                                alignItems: 'center',
+                                backgroundColor: mode === 'pink' ? '$primary' : 'transparent',
+                            }}
+                        >
+                            <Text sx={{ color: mode === 'pink' ? 'white' : '$text' }}>
+                                Pink
+                            </Text>
+                        </Pressable>
+                    </View>
+                </View>
+
+                {/* ---------- Status Bar ---------- */}
+                <StatusBar style="dark" />
             </ScrollView>
         </SafeAreaView>
-
     )
 }

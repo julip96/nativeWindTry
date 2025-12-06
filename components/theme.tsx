@@ -8,6 +8,8 @@ const standardColors = {
     $primary: '#e07a5f',
     $secondary: '#3d9970',
     $muted: '#f2e9e4',
+    $disabledBackground: '#e6e6e6',
+    $disabledText: '#999999',
 }
 
 // --- PINK THEME ---
@@ -17,6 +19,8 @@ const pinkColors = {
     $primary: '#ff4da6',
     $secondary: '#ff80bf',
     $muted: '#ffd6eb',
+    $disabledBackground: '#f2bcd6',
+    $disabledText: '#a26c9a',
 }
 
 const baseTheme = {
