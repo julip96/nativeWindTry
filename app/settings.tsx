@@ -1,10 +1,14 @@
 import React from 'react'
-import { View, Text, H1, ScrollView, Pressable } from 'dripsy'
+import { View, Text, H1, ScrollView } from 'dripsy'
 import { StatusBar } from 'expo-status-bar'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useThemeMode } from '../components/ThemeProvider'
 import { useSession } from '@/components/SessionProvider'
+
+import { ThemeCard } from '../components/ThemeCard'
+import { ThemeButton } from '../components/ThemeButton'
 import Account from '../components/Account'
+
 
 export default function SettingsScreen() {
     const session = useSession()
@@ -15,36 +19,15 @@ export default function SettingsScreen() {
             <ScrollView>
 
                 {/* ---------- Profile Card ---------- */}
-                <View
-                    sx={{
-                        backgroundColor: '$background',
-                        borderRadius: 20,
-                        padding: 24,
-                        margin: 16,
-                        alignItems: 'center',
-                        shadowColor: '#000',
-                        shadowOpacity: 0.05,
-                        shadowRadius: 10,
-                    }}
-                >
-                    <Account session={session.session} mode="header" />
-
-                </View>
+                <ThemeCard sx={{ margin: 16, alignItems: 'center' }}>
+                    <Account session={session.session} />
+                </ThemeCard>
 
                 {/* ---------- Theme Card ---------- */}
-                <View
-                    sx={{
-                        backgroundColor: '$background',
-                        borderRadius: 20,
-                        padding: 24,
-                        marginHorizontal: 16,
-                        marginTop: 8,
-                        shadowColor: '#000',
-                        shadowOpacity: 0.05,
-                        shadowRadius: 10,
-                    }}
-                >
-                    <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>Color Mode</H1>
+                <ThemeCard sx={{ margin: 16 }}>
+                    <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>
+                        Color Mode
+                    </H1>
 
                     {/* Segmented Control */}
                     <View
@@ -55,39 +38,61 @@ export default function SettingsScreen() {
                             padding: 4,
                         }}
                     >
-                        <Pressable
+                        <ThemeButton
+                            title="standard"
                             onPress={() => setMode('standard')}
                             sx={{
                                 flex: 1,
                                 paddingY: 10,
                                 borderRadius: 10,
                                 alignItems: 'center',
-                                backgroundColor: mode === 'standard' ? '$primary' : 'transparent',
+                                backgroundColor:
+                                    mode === 'standard' ? '$primary' : 'transparent',
+                                color: mode === 'standard' ? 'white' : 'black',
                             }}
                         >
                             <Text sx={{ color: mode === 'standard' ? 'white' : '$text' }}>
                                 Standard
                             </Text>
-                        </Pressable>
+                        </ThemeButton>
 
-                        <Pressable
+                        <ThemeButton
+                            title="Pink"
                             onPress={() => setMode('pink')}
                             sx={{
                                 flex: 1,
                                 paddingY: 10,
                                 borderRadius: 10,
                                 alignItems: 'center',
-                                backgroundColor: mode === 'pink' ? '$primary' : 'transparent',
+                                backgroundColor:
+                                    mode === 'pink' ? '$primary' : 'transparent',
                             }}
                         >
                             <Text sx={{ color: mode === 'pink' ? 'white' : '$text' }}>
                                 Pink
                             </Text>
-                        </Pressable>
+                        </ThemeButton>
                     </View>
-                </View>
+                </ThemeCard>
 
-                {/* ---------- Status Bar ---------- */}
+                <ThemeCard sx={{ margin: 16 }}>
+
+                    <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>
+                        Delete Account
+                    </H1>
+
+                    <ThemeButton title="Pink"
+                        onPress={() => setMode('pink')}
+                        sx={{
+                            flex: 1,
+                            paddingY: 10,
+                            borderRadius: 10,
+                            alignItems: 'center',
+                            backgroundColor: '$primary',
+                        }} />
+
+                </ThemeCard>
+
                 <StatusBar style="dark" />
             </ScrollView>
         </SafeAreaView>

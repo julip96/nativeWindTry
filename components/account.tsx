@@ -82,12 +82,12 @@ export default function Account({ session }) {
                     }}
                 />
 
-                <Text sx={{ fontSize: 20, fontWeight: 'bold', marginTop: 12, color: '$text' }}>
-                    {username || 'Username'}
+                <Text sx={{ fontSize: 14, fontWeight: '$secondaryText', marginTop: 12, color: '$text' }}>
+                    Username: {username || 'Username'}
                 </Text>
 
                 <Text sx={{ fontSize: 14, color: '$secondaryText', marginTop: 2 }}>
-                    {session?.user?.email}
+                    Mail: {session?.user?.email}
                 </Text>
 
                 <Pressable
@@ -98,6 +98,8 @@ export default function Account({ session }) {
                         paddingY: 8,
                         backgroundColor: '$mutedBackground',
                         borderRadius: 12,
+                        borderColor: '$border',
+                        borderWidth: 1,
                     }}
                 >
                     <Text sx={{ color: '$text' }}>Edit</Text>
