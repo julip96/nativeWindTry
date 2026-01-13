@@ -3,6 +3,9 @@ import { supabase } from '../utils/supabase'
 import { View, Text, Pressable, TextInput } from 'dripsy'
 import { Alert } from 'react-native'
 import Avatar from './Avatar'
+import { ThemeCard } from './ThemeCard'
+import { ThemeButton } from './ThemeButton'
+import { H1 } from 'dripsy'
 
 export default function Account({ session }) {
     const [loading, setLoading] = useState(true)
@@ -14,6 +17,51 @@ export default function Account({ session }) {
     useEffect(() => {
         if (session) getProfile()
     }, [session])
+
+    async function deleteAccount() {
+        try {
+            Alert.alert(
+                "Delete Account?",
+                "This will permanently delete your profile and all stored data. This cannot be undone.",
+                [
+                    { text: "Cancel", style: "cancel" },
+                    {
+                        text: "Delete",
+                        style: "destructive",
+                        onPress: async () => {
+                            const user = supabase.auth.getUser(); // hole aktuellen User
+                            const userId = (await user).data.user?.id;
+
+                            if (!userId) {
+                                Alert.alert("Error", "No user logged in.");
+                                return;
+                            }
+
+                            // CALL EDGE FUNCTION
+                            const { data, error } = await supabase.functions.invoke(
+                                "delete-user",
+                                { body: JSON.stringify({ userId }) }
+                            );
+
+                            if (error) {
+                                console.error(error);
+                                Alert.alert("Error", "Failed to delete account.");
+                                return;
+                            }
+
+                            // Log the user out locally
+                            await supabase.auth.signOut();
+                        },
+                    },
+                ]
+            );
+        } catch (err) {
+            console.error(err);
+            Alert.alert("Error", "Could not delete account.");
+        }
+    }
+
+
 
     async function getProfile() {
         try {
@@ -176,6 +224,24 @@ export default function Account({ session }) {
             >
                 <Text sx={{ color: '$text' }}>Cancel</Text>
             </Pressable>
+
+            <ThemeCard sx={{ margin: 16 }}>
+
+                <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>
+                    Delete Account
+                </H1>
+
+                <ThemeButton title="Delete Account"
+                    onPress={() => deleteAccount()}
+                    sx={{
+                        flex: 1,
+                        paddingY: 10,
+                        borderRadius: 10,
+                        alignItems: 'center',
+                        backgroundColor: '$primary',
+                    }} />
+
+            </ThemeCard>
 
         </View>
     )

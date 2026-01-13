@@ -75,23 +75,7 @@ export default function SettingsScreen() {
                     </View>
                 </ThemeCard>
 
-                <ThemeCard sx={{ margin: 16 }}>
 
-                    <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>
-                        Delete Account
-                    </H1>
-
-                    <ThemeButton title="Pink"
-                        onPress={() => setMode('pink')}
-                        sx={{
-                            flex: 1,
-                            paddingY: 10,
-                            borderRadius: 10,
-                            alignItems: 'center',
-                            backgroundColor: '$primary',
-                        }} />
-
-                </ThemeCard>
 
                 <StatusBar style="dark" />
             </ScrollView>
