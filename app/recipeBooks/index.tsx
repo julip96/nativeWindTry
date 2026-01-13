@@ -4,6 +4,7 @@ import { Pressable, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../utils/supabase';
 import { Ionicons } from '@expo/vector-icons'
+import { SearchHeader } from '../../components/SearchHeader';
 
 export default function RecipeBooksScreen() {
 
@@ -15,6 +16,7 @@ export default function RecipeBooksScreen() {
     // Animation values searchbar
     const fadeAnim = React.useRef(new Animated.Value(1)).current;
     const slideAnim = React.useRef(new Animated.Value(0)).current;
+    const searchAnim = React.useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         const loadBooks = async () => {
@@ -62,124 +64,51 @@ export default function RecipeBooksScreen() {
         ]).start();
     }, [isSearching]);
 
+    useEffect(() => {
+        Animated.timing(searchAnim, {
+            toValue: isSearching ? 1 : 0,
+            duration: 250,
+            useNativeDriver: true,
+        }).start();
+    }, [isSearching]);
+
+
     return (
 
         <ScrollView sx={{ flex: 1, bg: '$background', p: 'm' }}>
 
-            <Animated.View
-
-                style={{
-
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: 16,
-                    opacity: fadeAnim,
-                    transform: [{ translateY: slideAnim }]
-
-                }}
-
-            >
-                {!isSearching ? (
-
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            flex: 1,
-                        }}
+            <SearchHeader
+                title="Recipe Books"
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                isSearching={isSearching}
+                setIsSearching={setIsSearching}
+                searchPlaceholder="Search books..."
+                rightAction={
+                    <Pressable
+                        onPress={() => router.push('/recipeBooks/newBook')}
+                        android_ripple={{ color: '#ccc' }}
+                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
                     >
-                        <Text variant="heading">Recipe Books</Text>
-
-                        <View sx={{ flexDirection: 'row', gap: 10 }}>
-
-                            {/* Search Icon */}
-                            <Pressable
-                                onPress={() => setIsSearching(true)}
-                                android_ripple={{ color: '#ccc' }}
-                                style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-                            >
-
-                                <Ionicons name="search" size={24} color="black" />
-
-                            </Pressable>
-
-                            {/* New Book Button */}
-                            <Pressable
-
-                                android_ripple={{ color: '#ccc' }}
-                                onPress={() => router.push('/recipeBooks/newBook')}
-                                style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-
-                            >
-                                <View
-
-                                    sx={{
-                                        bg: '$primary',
-                                        px: 'm',
-                                        py: 's',
-                                        borderRadius: 'm',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-
-                                    }}
-
-                                >
-
-                                    <Text sx={{ color: 'white', fontWeight: 'bold' }}>+ New Book</Text>
-
-                                </View>
-
-                            </Pressable>
-
-                        </View>
-
-                    </View>
-
-                ) : (
-                    // Search Bar
-                    <View
-                        style={{
-
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            flex: 1
-
-                        }}
-                    >
-
-                        <TextInput
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                            placeholder="Search books..."
+                        <View
                             sx={{
-                                flex: 1,
-                                borderWidth: 1,
-                                borderColor: '$border',
+                                bg: '$primary',
+                                px: 'm',
+                                py: 's',
                                 borderRadius: 'm',
-                                p: 's',
-                                bg: '$muted',
+                                alignItems: 'center',
+                                justifyContent: 'center',
                             }}
-                        />
-
-                        <Pressable
-                            onPress={() => {
-                                setIsSearching(false);
-                                setSearchQuery('');
-                            }}
-                            style={({ pressed }) => [{ marginLeft: 10, opacity: pressed ? 0.6 : 1 }]}
                         >
+                            <Text sx={{ color: 'white', fontWeight: 'bold' }}>
+                                + New
+                            </Text>
+                        </View>
+                    </Pressable>
+                }
+            />
 
-                            <Ionicons name="close" size={24} color="black" />
 
-                        </Pressable>
-
-                    </View>
-
-                )}
-
-            </Animated.View >
 
 
 

@@ -1,11 +1,14 @@
 import React from 'react'
-import { Platform, Pressable } from 'react-native'
-import { View, Text, ScrollView } from 'dripsy'
+import { Animated, Platform, Pressable } from 'react-native'
+import { View, Text, ScrollView, TextInput } from 'dripsy'
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '../../utils/supabase'
 import { Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'
+import { SearchHeader } from '../../components/SearchHeader'
+
 
 
 export default function RecipesListScreen() {
@@ -14,6 +17,17 @@ export default function RecipesListScreen() {
     const { book_id } = useLocalSearchParams()
     const [recipes, setRecipes] = React.useState<any[]>([])
     const [loading, setLoading] = React.useState(false)
+    const [searchQuery, setSearchQuery] = React.useState('');
+    const [isSearching, setIsSearching] = React.useState(false);
+
+    const searchAnim = React.useRef(new Animated.Value(0)).current;
+    React.useEffect(() => {
+        Animated.timing(searchAnim, {
+            toValue: isSearching ? 1 : 0,
+            duration: 250,
+            useNativeDriver: true,
+        }).start();
+    }, [isSearching]);
 
     useFocusEffect(
 
@@ -53,6 +67,13 @@ export default function RecipesListScreen() {
         }
     }
 
+    const filteredRecipes = recipes.filter(recipe =>
+        recipe.title
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase())
+    );
+
+
     return (
 
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fffaf0' }}>
@@ -70,56 +91,46 @@ export default function RecipesListScreen() {
                 }}>
 
                 {/* Heading and Button in one line */}
-                <View
-
-                    sx={{
-
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        mb: 'm',
-
-                    }}
-                >
-
-                    <Text variant="heading">Recipes in this book</Text>
-
-                    <Pressable
-
-                        android_ripple={{ color: '#ccc' }}
-                        onPress={() => router.push(`/recipesListScreen/newRecipe?book_id=${book_id}`)}
-                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-
-                    >
-                        <View
-
-                            sx={{
-
-                                bg: '$primary',
-                                px: 'm',
-                                py: 's',
-                                borderRadius: 'm',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-
-                            }}
+                <SearchHeader
+                    title="Recipes"
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    isSearching={isSearching}
+                    setIsSearching={setIsSearching}
+                    searchPlaceholder="Search recipes..."
+                    rightAction={
+                        <Pressable
+                            onPress={() =>
+                                router.push(`/recipesListScreen/newRecipe?book_id=${book_id}`)
+                            }
                         >
+                            <View
+                                sx={{
+                                    bg: '$primary',
+                                    px: 'm',
+                                    py: 's',
+                                    borderRadius: 'm',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                                    + New
+                                </Text>
+                            </View>
+                        </Pressable>
+                    }
+                />
 
-                            <Text sx={{ color: 'white', fontWeight: 'bold' }}>+ New</Text>
 
-                        </View>
-
-                    </Pressable>
-
-                </View>
 
                 {/* Recipe cards */}
                 {loading ? (
                     <Text>Loading recipes...</Text>
-                ) : recipes.length === 0 ? (
+                ) : filteredRecipes.length === 0 ? (
                     <Text>No recipes found in this book.</Text>
                 ) : (
-                    recipes.map((recipe) => (
+                    filteredRecipes.map((recipe) => (
 
                         <View
 
