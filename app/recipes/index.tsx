@@ -39,31 +39,30 @@ export default function RecipesListScreen() {
 
     )
 
+
     async function loadRecipes() {
-
-        if (!book_id) return
-
         try {
-
             setLoading(true)
 
-            const { data, error } = await supabase
+            let query = supabase
                 .from('recipes')
                 .select('*')
-                .eq('book_id', book_id)
-                .order('created_at', { ascending: false })
+                .order('created_at', { ascending: false });
+
+            // Wenn book_id existiert, filtere nach diesem Buch
+            if (book_id) {
+                query = query.eq('book_id', book_id)
+            }
+
+            const { data, error } = await query
 
             if (error) throw error
             setRecipes(data || [])
 
         } catch (e) {
-
             console.error('Error loading recipes:', e)
-
         } finally {
-
             setLoading(false)
-
         }
     }
 
@@ -101,7 +100,7 @@ export default function RecipesListScreen() {
                     rightAction={
                         <Pressable
                             onPress={() =>
-                                router.push(`/recipesListScreen/newRecipe?book_id=${book_id}`)
+                                router.push(`/recipes/newRecipe${book_id ? `book_id=${book_id}` : ''}`)
                             }
                         >
                             <View
@@ -128,7 +127,11 @@ export default function RecipesListScreen() {
                 {loading ? (
                     <Text>Loading recipes...</Text>
                 ) : filteredRecipes.length === 0 ? (
-                    <Text>No recipes found in this book.</Text>
+                    <Text>
+
+                        {book_id ? 'No recipes found in this book.' : 'No recipes found.'}
+
+                    </Text>
                 ) : (
                     filteredRecipes.map((recipe) => (
 
@@ -166,7 +169,7 @@ export default function RecipesListScreen() {
                             <Pressable
 
                                 android_ripple={{ color: '#ccc' }}
-                                onPress={() => router.push(`/recipesListScreen/${recipe.id}`)}
+                                onPress={() => router.push(`/recipes/${recipe.id}`)}
                                 style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
 
                             >

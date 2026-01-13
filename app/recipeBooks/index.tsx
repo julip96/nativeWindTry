@@ -123,7 +123,7 @@ export default function RecipeBooksScreen() {
                             key={book.id}
                             android_ripple={{ color: '#ddd' }}
                             onPress={() =>
-                                router.push(`/recipesListScreen?book_id=${book.id}`)
+                                router.push(`/recipes?book_id=${book.id}`)
                             }
                         >
                             <View sx={{ bg: '$muted', p: 'm', mb: 's', borderRadius: 'm' }}>
