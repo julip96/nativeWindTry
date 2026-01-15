@@ -100,7 +100,7 @@ export default function RecipesListScreen() {
                     rightAction={
                         <Pressable
                             onPress={() =>
-                                router.push(`/recipes/newRecipe${book_id ? `book_id=${book_id}` : ''}`)
+                                router.push(`/recipes/newRecipe${book_id ? `?book_id=${book_id}` : ''}`)
                             }
                         >
                             <View

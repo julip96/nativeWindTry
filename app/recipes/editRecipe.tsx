@@ -23,10 +23,38 @@ export default function EditRecipeScreen() {
     const [instructions, setInstructions] = useState("");
     const [image, setImage] = useState<string | null>(null);
 
+    const [userId, setUserId] = useState<string | null>(null);
+
+    // Kochbücher
+    const [books, setBooks] = useState<{ id: string; name: string }[]>([]);
+    const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+
+
 
     useEffect(() => {
         const loadRecipe = async () => {
+
             if (!id) return;
+
+            const { data: userData, error: userError } = await supabase.auth.getUser();
+            if (userError || !userData.user) {
+                throw userError;
+            }
+            setUserId(userData.user.id);
+
+            const { data: booksData, error: booksError } = await supabase
+                .from("recipe_books")
+                .select("id, name")
+                .eq("owner_id", userData.user.id)
+                .order("name");
+
+            if (booksError) {
+                console.error("Error loading cookbooks:", booksError);
+            } else {
+                setBooks(booksData || []);
+            }
+
+
             try {
                 const { data, error } = await supabase
                     .from("recipes")
@@ -39,6 +67,7 @@ export default function EditRecipeScreen() {
                 setTitle(data.title || "");
                 setInstructions(data.instructions || "");
                 setImage(data.image_url || "");
+                setSelectedBookId(data.book_id);
 
                 try {
                     const parsedIngredients =
@@ -50,6 +79,7 @@ export default function EditRecipeScreen() {
                         setIngredients(
                             parsedIngredients.map((ing) => ({
                                 amount: ing.amount ?? "",
+
                                 unit: ing.unit ?? "",
                                 name: ing.name ?? "",
                             }))
@@ -141,13 +171,14 @@ export default function EditRecipeScreen() {
                     ingredients: JSON.stringify(ingredients),
                     instructions,
                     image_url: image,
+                    book_id: selectedBookId,
                 })
                 .eq("id", id);
 
             if (error) throw error;
 
             Alert.alert("Success", "Recipe updated!");
-            router.replace((`/recipesListScreen/${id}`))
+            router.replace((`/recipes/${id}`))
 
         } catch (e) {
             console.error("Error updating recipe:", e);
@@ -169,11 +200,70 @@ export default function EditRecipeScreen() {
                     onChangeText={setTitle}
                 />
 
-                <PhotoPickerBox
-                    onChange={(uri) => {
-                        setImage(uri);
+                {/* 🏷 Cookbook */}
+                <Text sx={{ fontWeight: "bold", mb: "s" }}>Cookbook</Text>
+                <View
+                    sx={{
+                        borderWidth: 1,
+                        borderColor: "$border",
+                        borderRadius: "m",
+                        overflow: "hidden",
+                        mb: "m",
+                        bg: "white",
                     }}
-                />
+                >
+                    <Picker
+                        selectedValue={selectedBookId}
+                        onValueChange={(val) => setSelectedBookId(val)}
+                        style={{ height: 40 }}
+                    >
+                        {books.map((b) => (
+                            <Picker.Item key={b.id} label={b.name} value={b.id} />
+                        ))}
+                    </Picker>
+                </View>
+
+
+                {/* 📸 Bildpicker Buttons */}
+                <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: "m" }}>
+                    <Pressable onPress={handlePickImage}>
+                        <View
+                            sx={{
+                                bg: "$secondary",
+                                p: "m",
+                                borderRadius: "m",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: 150,
+                            }}
+                        >
+                            <Text sx={{ color: "white", fontWeight: "bold" }}>From Gallery</Text>
+                        </View>
+                    </Pressable>
+
+                    <Pressable onPress={handleTakePhoto}>
+                        <View
+                            sx={{
+                                bg: "$primary",
+                                p: "m",
+                                borderRadius: "m",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: 150,
+                            }}
+                        >
+                            <Text sx={{ color: "white", fontWeight: "bold" }}>Take Photo</Text>
+                        </View>
+                    </Pressable>
+                </View>
+
+                {/* 🖼 Bildanzeige – IDENTISCH zu NewRecipe */}
+                {image && (
+                    <PhotoPickerBox onChange={setImage} uri={image} />
+                )}
+
+
+
 
                 {/* 🧂 Ingredients */}
                 <Text sx={{ fontWeight: "bold", mt: "m", mb: "s" }}>Ingredients</Text>

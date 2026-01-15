@@ -4,9 +4,20 @@ import * as ImagePicker from "expo-image-picker";
 import { View, Text } from "dripsy";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function PhotoPickerBox({ onChange }: { onChange?: (uri: string) => void }) {
-    const [imageUri, setImageUri] = useState<string | null>(null);
+export default function PhotoPickerBox({
+    uri,        // neues Prop
+    onChange,
+}: {
+    uri?: string;
+    onChange?: (uri: string) => void;
+}) {
+    const [imageUri, setImageUri] = useState<string | null>(uri || null);
     const [loading, setLoading] = useState(false);
+
+    // Synchronisiere State, falls uri von außen geändert wird (EditScreen)
+    React.useEffect(() => {
+        if (uri) setImageUri(uri);
+    }, [uri]);
 
     async function pickImage() {
         try {
@@ -17,9 +28,9 @@ export default function PhotoPickerBox({ onChange }: { onChange?: (uri: string) 
             });
 
             if (!result.canceled) {
-                const uri = result.assets[0].uri;
-                setImageUri(uri);
-                onChange?.(uri);
+                const newUri = result.assets[0].uri;
+                setImageUri(newUri);
+                onChange?.(newUri);
             }
         } catch (err) {
             console.warn("Image pick error:", err);
@@ -48,7 +59,6 @@ export default function PhotoPickerBox({ onChange }: { onChange?: (uri: string) 
                     elevation: 4,
                 }}
             >
-                {/* Image */}
                 {imageUri ? (
                     <Image
                         source={{ uri: imageUri }}
@@ -60,7 +70,6 @@ export default function PhotoPickerBox({ onChange }: { onChange?: (uri: string) 
                     <Text sx={{ color: "$muted", fontSize: 16 }}>Tap to add photo</Text>
                 )}
 
-                {/* Floating "Change" button */}
                 {imageUri && !loading && (
                     <View
                         sx={{
