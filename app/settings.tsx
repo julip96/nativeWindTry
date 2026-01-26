@@ -8,11 +8,32 @@ import { useSession } from '@/components/SessionProvider'
 import { ThemeCard } from '../components/ThemeCard'
 import { ThemeButton } from '../components/ThemeButton'
 import Account from '../components/Account'
+import { supabase } from '../utils/supabase'
+import { Alert } from 'react-native'
 
 
 export default function SettingsScreen() {
     const session = useSession()
     const { mode, setMode } = useThemeMode()
+
+    async function handleLogout() {
+        const { error } = await supabase.auth.signOut()
+
+        if (error) {
+            Alert.alert('Logout failed', error.message)
+        }
+    }
+
+    function confirmLogout() {
+        Alert.alert(
+            'Sign out',
+            'Do you really want to log out?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Logout', style: 'destructive', onPress: handleLogout },
+            ]
+        )
+    }
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -28,6 +49,8 @@ export default function SettingsScreen() {
                     <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>
                         Color Mode
                     </H1>
+
+
 
                     {/* Segmented Control */}
                     <View
@@ -75,6 +98,23 @@ export default function SettingsScreen() {
                     </View>
                 </ThemeCard>
 
+                {/* ---------- Logout Card ---------- */}
+                <ThemeCard sx={{ margin: 16 }}>
+                    <ThemeButton
+                        title="Logout"
+                        onPress={confirmLogout}
+                        sx={{
+                            backgroundColor: '#d9534f',
+                            paddingY: 14,
+                            borderRadius: 12,
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Text sx={{ color: 'white', fontWeight: 'bold' }}>
+                            Logout
+                        </Text>
+                    </ThemeButton>
+                </ThemeCard>
 
 
                 <StatusBar style="dark" />
