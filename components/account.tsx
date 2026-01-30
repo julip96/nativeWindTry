@@ -182,20 +182,6 @@ export default function Account({ session }) {
                 }}
             />
 
-            <Text sx={{ color: '$text', marginTop: 16 }}>Website</Text>
-            <TextInput
-                value={website}
-                onChangeText={setWebsite}
-                style={{
-                    borderWidth: 1,
-                    borderColor: '#ccc',
-                    padding: 8,
-                    marginTop: 4,
-                    borderRadius: 8,
-                    color: 'black'
-                }}
-            />
-
             <Pressable
                 onPress={updateProfile}
                 disabled={loading}

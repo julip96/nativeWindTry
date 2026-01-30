@@ -215,7 +215,7 @@ export default function EditRecipeScreen() {
                     <Picker
                         selectedValue={selectedBookId}
                         onValueChange={(val) => setSelectedBookId(val)}
-                        style={{ height: 40 }}
+                        style={{ height: 50 }}
                     >
                         {books.map((b) => (
                             <Picker.Item key={b.id} label={b.name} value={b.id} />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, ScrollView, Alert } from "dripsy";
-import { Pressable } from "react-native";
+import { View, Text, TextInput, ScrollView } from "dripsy";
+import { Pressable, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "../../utils/supabase";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -17,6 +17,7 @@ export default function NewRecipe() {
     const [instructions, setInstructions] = useState("");
     const [image, setImage] = useState<string | null>(null);
 
+    const [focusedField, setFocusedField] = useState<string | null>(null);
     // Kochbücher
     const [books, setBooks] = useState<{ id: string; name: string }[]>([]);
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
@@ -54,11 +55,17 @@ export default function NewRecipe() {
             }
 
         };
+
         fetchUserAndBooks();
+
     }, []);
 
     // 🧾 Zutatenzeilen-Funktionen
-    const handleIngredientChange = (index: number, field: "amount" | "unit" | "name", value: string) => {
+    const handleIngredientChange = (
+        index: number,
+        field: "amount" | "unit" | "name",
+        value: string
+    ) => {
         const updated = [...ingredients];
         updated[index][field] = value;
         setIngredients(updated);
@@ -169,8 +176,12 @@ export default function NewRecipe() {
                     <Picker
                         selectedValue={selectedBookId}
                         onValueChange={(val) => setSelectedBookId(val)}
-                        style={{ height: 40 }}
+                        style={{ height: 50 }}
                     >
+
+                        {/* Fester Standardwert */}
+                        <Picker.Item label="No specific Cookbook" value={null} />
+
                         {books.map((b) => (
                             <Picker.Item key={b.id} label={b.name} value={b.id} />
                         ))}

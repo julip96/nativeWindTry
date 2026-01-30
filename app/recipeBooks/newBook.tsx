@@ -39,7 +39,7 @@ export default function NewRecipeBookScreen() {
             return;
         }
 
-        router.back();
+        router.push('/recipeBooks');
     };
 
     return (
