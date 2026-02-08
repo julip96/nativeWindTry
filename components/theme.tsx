@@ -3,10 +3,11 @@ import { makeTheme } from 'dripsy'
 
 // --- STANDARD THEME ---
 const standardColors = {
-    $background: '#fffaf0',
-    $text: '#333333',
-    $primary: '#e07a5f',
-    $secondary: '#3d9970',
+    $background: '#ffffff',
+    $text: '#000000',
+    $primary: '#F4F1BB',
+    $secondary: '#9BC1BC',
+    $accent: '#ED6A5A',
     $muted: '#f2e9e4',
     $disabledBackground: '#e6e6e6',
     $disabledText: '#999999',
@@ -14,10 +15,11 @@ const standardColors = {
 
 // --- PINK THEME ---
 const pinkColors = {
-    $background: '#ffe6f2',
-    $text: '#3a003a',
+    $background: '#ffffff',
+    $text: '#000000',
     $primary: '#ff4da6',
     $secondary: '#ff80bf',
+    $accent: '#ffb3d9',
     $muted: '#ffd6eb',
     $disabledBackground: '#f2bcd6',
     $disabledText: '#a26c9a',
@@ -31,7 +33,22 @@ const baseTheme = {
         heading: { fontSize: 22, fontWeight: 'bold', color: '$text' },
         small: { fontSize: 14, color: '$text' },
     },
+
+    shadows: {
+        md: {
+            // iOS
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.12,
+            shadowRadius: 6,
+
+            // Android
+            elevation: 4,
+        },
+    },
+
 }
+
 
 export const standardTheme = makeTheme({ colors: standardColors, ...baseTheme })
 export const pinkTheme = makeTheme({ colors: pinkColors, ...baseTheme })

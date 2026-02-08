@@ -85,6 +85,7 @@ export default function NewRecipe() {
 
     const handleAddIngredientRow = () => {
         setIngredients([...ingredients, { amount: "", unit: "g", name: "" }]);
+
     };
 
     const handleRemoveIngredient = (index: number) => {
@@ -133,11 +134,18 @@ export default function NewRecipe() {
 
     /** 🔹 Shared input style */
     const inputStyle = (field: string) => ({
-        bg: "$surface",
-        borderWidth: 3,
-        borderColor: focusedField === field ? "$secondary" : "$primary",
-        borderRadius: "m",
+
+        mb: "s",
+        bg: "$background",
         p: "s",
+        borderRadius: "m",
+        borderColor: focusedField === field ? "$secondary" : "$primary", borderWidth: 2,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+        elevation: 3,
+
     });
 
     return (
@@ -156,11 +164,15 @@ export default function NewRecipe() {
                     {/* Title */}
                     <Text sx={{ fontWeight: "bold", mb: "xs" }}>Recipe Title</Text>
                     <TextInput
-                        sx={{ ...inputStyle("title"), mb: "m" }}
+                        sx={{
+                            ...inputStyle("title"), mb: "m",
+
+                        }}
                         placeholder="e.g. Creamy Mushroom Pasta"
                         value={title}
                         onFocus={() => handleFocus("title")}
                         onChangeText={setTitle}
+
                     />
 
                     {/* Cookbook */}
@@ -188,15 +200,21 @@ export default function NewRecipe() {
                             key={index}
                             sx={{
                                 mb: "s",
-                                bg: "$surface",
+                                bg: "$background",
                                 p: "s",
-                                borderWidth: 1,
-                                borderColor: "$primary",
                                 borderRadius: "m",
+                                borderColor: "$primary",
+                                borderWidth: 1,
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 2 },
+                                shadowOpacity: 0.3,
+                                shadowRadius: 10,
+                                elevation: 3,
+
                             }}>
                             <View sx={{ flexDirection: "row", alignItems: "center" }}>
                                 <TextInput
-                                    sx={{ ...inputStyle(`amt-${index}`), width: 70, mr: "s", textAlign: "center" }}
+                                    sx={{ ...inputStyle(`amt-${index}`), width: 70, mr: "s", textAlign: "center", height: '90%' }}
                                     placeholder="Amt"
                                     value={item.amount}
                                     keyboardType="numeric"
@@ -207,7 +225,7 @@ export default function NewRecipe() {
                                 />
 
 
-                                <View sx={{ ...inputStyle(`unit-${index}`), width: 90, mr: "s", p: 1 }}>
+                                <View sx={{ ...inputStyle(`unit-${index}`), width: 120, height: '90%', mr: "s", p: 1 }}>
                                     <Picker
                                         selectedValue={item.unit}
                                         onFocus={() => handleFocus(`unit-${index}`)}
@@ -223,23 +241,30 @@ export default function NewRecipe() {
                                 </View>
 
                                 <TextInput
-                                    sx={{ ...inputStyle(`name-${index}`), flex: 1 }}
+                                    sx={{ ...inputStyle(`name-${index}`), flex: 1, height: '90%' }}
                                     placeholder="Ingredient Name"
                                     value={item.name}
                                     onFocus={() => handleFocus(`name-${index}`)}
                                     onChangeText={(text) => handleIngredientChange(index, "name", text)}
                                 />
 
-                                <Pressable onPress={() => handleRemoveIngredient(index)}>
+                                <Pressable onPress={() => handleRemoveIngredient(index)} sx={{ m: "s" }}>
                                     <Ionicons name="trash" size={22} color="red" />
                                 </Pressable>
                             </View>
                         </View>
                     ))}
 
-                    <Pressable onPress={handleAddIngredientRow} sx={{ mb: "m", p: "s" }}>
-                        <View sx={{ bg: "$primary", p: "s", borderRadius: "m", alignItems: "center", mb: "m" }}>
-                            <Text sx={{ color: "white", fontWeight: "bold" }}>+ Add Ingredient</Text>
+                    <Pressable onPress={handleAddIngredientRow} >
+                        <View sx={{
+                            bg: "$primary", p: "m", borderRadius: "m", alignItems: "center",
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.3,
+                            shadowRadius: 10,
+                            elevation: 3,
+                        }}>
+                            <Text sx={{ color: "$text", fontWeight: "bold" }}>+ Add Ingredient</Text>
                         </View>
                     </Pressable>
 
@@ -261,8 +286,15 @@ export default function NewRecipe() {
 
                     {/* Save */}
                     <Pressable onPress={handleSaveRecipe}>
-                        <View sx={{ bg: "$primary", p: "m", borderRadius: "m", alignItems: "center" }}>
-                            <Text sx={{ color: "white", fontWeight: "bold" }}>Save</Text>
+                        <View sx={{
+                            bg: "$primary", p: "m", borderRadius: "m", alignItems: "center",
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.3,
+                            shadowRadius: 10,
+                            elevation: 3,
+                        }}>
+                            <Text sx={{ color: "$text", fontWeight: "bold" }}>Save</Text>
                         </View>
                     </Pressable>
                 </View>

@@ -100,7 +100,7 @@ export default function RecipeBooksScreen() {
                                 justifyContent: 'center',
                             }}
                         >
-                            <Text sx={{ color: 'white', fontWeight: 'bold' }}>
+                            <Text sx={{ color: "$text", fontWeight: 'bold' }}>
                                 + New
                             </Text>
                         </View>

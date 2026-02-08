@@ -75,134 +75,122 @@ export default function RecipesListScreen() {
 
     return (
 
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#fffaf0' }}>
 
-            <ScrollView
+        <ScrollView sx={{ flex: 1, bg: '$background', p: 'm' }}>
 
-                sx={{
+            {/* Heading and Button in one line */}
+            <SearchHeader
+                title="Recipes"
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                isSearching={isSearching}
+                setIsSearching={setIsSearching}
+                searchPlaceholder="Search recipes..."
+                rightAction={
+                    <Pressable
+                        onPress={() =>
+                            router.push(`/recipes/newRecipe${book_id ? `?book_id=${book_id}` : ''}`)
+                        }
+                    >
+                        <View
+                            sx={{
+                                bg: '$primary',
+                                px: 'm',
+                                py: 's',
+                                borderRadius: 'm',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Text style={{ color: "$text", fontWeight: 'bold' }}>
+                                + New
+                            </Text>
+                        </View>
+                    </Pressable>
+                }
+            />
 
-                    flex: 1,
-                    bg: '$background',
-                    p: 'm',
-                    paddingTop: Platform.OS === 'android' ? 0 : 0,
-                    paddingBottom: Platform.OS === 'android' ? 20 : 0,
 
-                }}>
 
-                {/* Heading and Button in one line */}
-                <SearchHeader
-                    title="Recipes"
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    isSearching={isSearching}
-                    setIsSearching={setIsSearching}
-                    searchPlaceholder="Search recipes..."
-                    rightAction={
+            {/* Recipe cards */}
+            {loading ? (
+                <Text>Loading recipes...</Text>
+            ) : filteredRecipes.length === 0 ? (
+                <Text>
+
+                    {book_id ? 'No recipes found in this book.' : 'No recipes found.'}
+
+                </Text>
+            ) : (
+                filteredRecipes.map((recipe) => (
+
+                    <View
+
+                        key={recipe.id}
+
+                        sx={{
+
+                            bg: '$muted',
+                            p: 'm',
+                            mb: 's',
+                            borderRadius: 'm',
+
+                        }}
+                    >
+
+                        <Text variant="heading">{recipe.title}</Text>
+
+                        {recipe.image_url ? (
+                            <Image
+                                source={{ uri: recipe.image_url }}
+                                style={{
+                                    width: '100%',
+                                    height: 120,
+                                    borderRadius: 10,
+                                    marginBottom: 8,
+                                    marginTop: 4,
+                                }}
+                                resizeMode="cover"
+                            />
+                        ) : null}
+
+
                         <Pressable
-                            onPress={() =>
-                                router.push(`/recipes/newRecipe${book_id ? `?book_id=${book_id}` : ''}`)
-                            }
+
+                            android_ripple={{ color: '#ccc' }}
+                            onPress={() => router.push(`/recipes/${recipe.id}`)}
+                            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+
                         >
                             <View
                                 sx={{
+
                                     bg: '$primary',
-                                    px: 'm',
-                                    py: 's',
+                                    p: 'm',
                                     borderRadius: 'm',
                                     alignItems: 'center',
                                     justifyContent: 'center',
+                                    mt: 's'
+
                                 }}
                             >
-                                <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                                    + New
-                                </Text>
+                                <Text sx={{ color: "$text", fontWeight: 'bold' }}>View</Text>
+
                             </View>
+
                         </Pressable>
-                    }
-                />
 
+                    </View>
 
+                ))
 
-                {/* Recipe cards */}
-                {loading ? (
-                    <Text>Loading recipes...</Text>
-                ) : filteredRecipes.length === 0 ? (
-                    <Text>
-
-                        {book_id ? 'No recipes found in this book.' : 'No recipes found.'}
-
-                    </Text>
-                ) : (
-                    filteredRecipes.map((recipe) => (
-
-                        <View
-
-                            key={recipe.id}
-
-                            sx={{
-
-                                bg: '$muted',
-                                p: 'm',
-                                mb: 's',
-                                borderRadius: 'm',
-
-                            }}
-                        >
-
-                            <Text variant="heading">{recipe.title}</Text>
-
-                            {recipe.image_url ? (
-                                <Image
-                                    source={{ uri: recipe.image_url }}
-                                    style={{
-                                        width: '100%',
-                                        height: 120,
-                                        borderRadius: 10,
-                                        marginBottom: 8,
-                                        marginTop: 4,
-                                    }}
-                                    resizeMode="cover"
-                                />
-                            ) : null}
-
-
-                            <Pressable
-
-                                android_ripple={{ color: '#ccc' }}
-                                onPress={() => router.push(`/recipes/${recipe.id}`)}
-                                style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-
-                            >
-                                <View
-                                    sx={{
-
-                                        bg: '$primary',
-                                        p: 'm',
-                                        borderRadius: 'm',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        mt: 's'
-
-                                    }}
-                                >
-                                    <Text sx={{ color: 'white', fontWeight: 'bold' }}>View</Text>
-
-                                </View>
-
-                            </Pressable>
-
-                        </View>
-
-                    ))
-
-                )}
-
-            </ScrollView>
-
+            )}
 
             <StatusBar style="dark" />
+        </ScrollView>
 
 
-        </SafeAreaView>
+
+
     )
 }
