@@ -26,12 +26,35 @@ const pinkColors = {
 }
 
 const baseTheme = {
-    space: { xs: 4, s: 8, m: 16, l: 24, xl: 32 },
-    radii: { s: 6, m: 12, l: 20 },
+
+    space: {
+        xs: 4,
+        s: 8,
+        m: 16,
+        l: 24,
+        xl: 32,
+    },
+    radii: {
+        s: 6,
+        m: 12,
+        l: 20,
+    },
+
     text: {
-        body: { fontSize: 16, color: '$text' },
-        heading: { fontSize: 22, fontWeight: 'bold', color: '$text' },
-        small: { fontSize: 14, color: '$text' },
+        body: {
+            fontSize: 16,
+            color: '$text',
+        },
+        heading: {
+            fontSize: 22,
+            color: '$text',
+            // fontFamily: fontName,
+            // fontWeight: 'bold',
+        },
+        small: {
+            fontSize: 14,
+            color: '$text',
+        },
     },
 
     shadows: {
@@ -46,6 +69,8 @@ const baseTheme = {
             elevation: 4,
         },
     },
+
+
 
 }
 

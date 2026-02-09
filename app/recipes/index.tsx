@@ -1,13 +1,10 @@
+import { ScrollView, Text, View } from 'dripsy'
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 import React from 'react'
-import { Animated, Platform, Pressable } from 'react-native'
-import { View, Text, ScrollView, TextInput } from 'dripsy'
-import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { StatusBar } from 'expo-status-bar';
-import { supabase } from '../../utils/supabase'
-import { Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'
+import { Animated, Image, Pressable } from 'react-native'
 import { SearchHeader } from '../../components/SearchHeader'
+import { supabase } from '../../utils/supabase'
 
 
 
@@ -15,6 +12,7 @@ export default function RecipesListScreen() {
 
     const router = useRouter()
     const { book_id } = useLocalSearchParams()
+    const [title, setTitle] = React.useState('Recipes')
     const [recipes, setRecipes] = React.useState<any[]>([])
     const [loading, setLoading] = React.useState(false)
     const [searchQuery, setSearchQuery] = React.useState('');
@@ -52,6 +50,19 @@ export default function RecipesListScreen() {
             // Wenn book_id existiert, filtere nach diesem Buch
             if (book_id) {
                 query = query.eq('book_id', book_id)
+
+                let { data: bookData, error: bookError } = await supabase.from('recipe_books')
+                    .select('name')
+                    .eq('id', book_id)
+                    .single()
+
+                if (bookError) throw bookError
+
+                if (bookData) {
+                    setTitle('Recipes in ' + bookData.name)
+                }
+
+
             }
 
             const { data, error } = await query
@@ -80,7 +91,7 @@ export default function RecipesListScreen() {
 
             {/* Heading and Button in one line */}
             <SearchHeader
-                title="Recipes"
+                title={title}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 isSearching={isSearching}
