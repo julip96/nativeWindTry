@@ -1,5 +1,6 @@
 // theme.ts
 import { makeTheme } from 'dripsy'
+import { Platform } from 'react-native'
 
 // --- STANDARD THEME ---
 const standardColors = {
@@ -59,14 +60,22 @@ const baseTheme = {
 
     shadows: {
         md: {
-            // iOS
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.12,
-            shadowRadius: 6,
+            ...Platform.select({
+                ios: {
 
-            // Android
-            elevation: 4,
+                    // iOS
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.12,
+                    shadowRadius: 6,
+                },
+                android: {
+
+                    // Android
+                    elevation: 4,
+
+                }
+            })
         },
     },
 
