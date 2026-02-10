@@ -1,7 +1,7 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
-import { DripsyProvider } from 'dripsy'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { standardTheme, pinkTheme } from './Theme'
+import { DripsyProvider } from 'dripsy'
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { pinkTheme, standardTheme } from './Theme'
 
 type ThemeContextType = {
 

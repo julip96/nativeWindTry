@@ -1,16 +1,21 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { Platform } from 'react-native'
-import { View, Pressable, Text } from 'dripsy'
-import { useColorScheme } from 'react-native'
-import { ThemeProvider } from '../components/ThemeProvider'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Slot, useSegments } from 'expo-router'
-import { supabase } from '../utils/supabase'
-import Auth from '../components/Auth'
 import { Session } from '@supabase/supabase-js'
+import { Pressable, Text, View } from 'dripsy'
+import { Href, Slot, useRouter, useSegments } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { Keyboard, Platform, useColorScheme } from 'react-native'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import Auth from '../components/Auth'
 import { SessionProvider } from '../components/SessionProvider'
+import { ThemeProvider } from '../components/ThemeProvider'
+import { supabase } from '../utils/supabase'
+
+type TabConfig = {
+  name: string
+  label: string
+  path: Href
+}
 
 export default function RootLayout() {
 
@@ -27,29 +32,26 @@ export default function RootLayout() {
     supabase.auth.getSession().then(({ data: { session } }) => {
 
       setSession(session)
-
     })
 
-    const { subscription } = supabase.auth.onAuthStateChange((_event, session) => {
-
+    // In Supabase v2, onAuthStateChange returns { data: { subscription } }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
-
     })
 
+    // Guard against missing subscription when cleaning up
     return () => {
-
-      subscription.unsubscribe()
-
+      subscription?.unsubscribe()
     }
 
   }, [])
 
-  const tabs = [
-
+  const tabs: TabConfig[] = [
     { name: 'recipeBooks', label: 'Books', path: '/recipeBooks' },
     { name: 'recipes', label: 'Recipes', path: '/recipes' },
     { name: 'settings', label: 'Settings', path: '/settings' },
-
   ]
 
   // If no session, show Auth screen instead of tabs
@@ -149,6 +151,9 @@ export default function RootLayout() {
 
                       onPress={() => {
 
+                        // Always dismiss keyboard when switching tabs
+                        Keyboard.dismiss()
+
                         if (!isActive) router.push(tab.path)
 
                       }}
@@ -226,6 +231,9 @@ export default function RootLayout() {
                       }}
 
                       onPress={() => {
+
+                        // Always dismiss keyboard when switching tabs
+                        Keyboard.dismiss()
 
                         if (!isActive) router.push(tab.path)
 

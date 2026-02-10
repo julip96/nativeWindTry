@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TextInput } from 'dripsy';
-import { Pressable, Animated } from 'react-native';
+import { ScrollView, Text, View } from 'dripsy';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../utils/supabase';
-import { Ionicons } from '@expo/vector-icons'
+import React, { useEffect, useState } from 'react';
+import { Animated, Keyboard, Pressable } from 'react-native';
 import { SearchHeader } from '../../components/SearchHeader';
+import { supabase } from '../../utils/supabase';
 
 export default function RecipeBooksScreen() {
 
@@ -75,65 +74,80 @@ export default function RecipeBooksScreen() {
 
     return (
 
-        <ScrollView sx={{ flex: 1, bg: '$background', p: 'm' }}>
+        <View sx={{ flex: 1, bg: '$background', p: 'm' }}>
 
-            <SearchHeader
-                title="Recipe Books"
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                isSearching={isSearching}
-                setIsSearching={setIsSearching}
-                searchPlaceholder="Search books..."
-                rightAction={
-                    <Pressable
-                        onPress={() => router.push('/recipeBooks/newBook')}
-                        android_ripple={{ color: '#ccc' }}
-                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-                    >
-                        <View
-                            sx={{
-                                bg: '$primary',
-                                px: 'm',
-                                py: 's',
-                                borderRadius: 'm',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <Text sx={{ color: "$text", fontWeight: 'bold' }}>
-                                + New
-                            </Text>
-                        </View>
-                    </Pressable>
-                }
-            />
+            <ScrollView
+                sx={{ flex: 1 }}
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
+                onScrollBeginDrag={() => {
+                    if (isSearching) {
+                        setIsSearching(false);
+                        setSearchQuery('');
+                    }
+                    Keyboard.dismiss();
+                }}
+                onTouchStart={() => {
+                    if (isSearching) {
+                        setIsSearching(false);
+                        setSearchQuery('');
+                    }
+                }}
+            >
 
-
-
-
-
-
-            {/* Book list */}
-            {
-                filteredBooks.length === 0 ? (
-                    <Text>No recipe books found.</Text>
-                ) : (
-                    filteredBooks.map((book) => (
+                <SearchHeader
+                    title="Recipe Books"
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    isSearching={isSearching}
+                    setIsSearching={setIsSearching}
+                    searchPlaceholder="Search books..."
+                    rightAction={
                         <Pressable
-                            key={book.id}
-                            android_ripple={{ color: '#ddd' }}
-                            onPress={() =>
-                                router.push(`/recipes?book_id=${book.id}`)
-                            }
+                            onPress={() => router.push('/recipeBooks/newBook')}
+                            android_ripple={{ color: '#ccc' }}
+                            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
                         >
-                            <View sx={{ bg: '$muted', p: 'm', mb: 's', borderRadius: 'm' }}>
-                                <Text variant="heading">{book.name}</Text>
-                                <Text variant="small">Created: {new Date(book.created_at).toLocaleDateString()}</Text>
+                            <View
+                                sx={{
+                                    bg: '$primary',
+                                    px: 'm',
+                                    py: 's',
+                                    borderRadius: 'm',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <Text sx={{ color: "$text", fontWeight: 'bold' }}>
+                                    + New
+                                </Text>
                             </View>
                         </Pressable>
-                    ))
-                )
-            }
-        </ScrollView >
+                    }
+                />
+
+                {/* Book list */}
+                {
+                    filteredBooks.length === 0 ? (
+                        <Text>No recipe books found.</Text>
+                    ) : (
+                        filteredBooks.map((book) => (
+                            <Pressable
+                                key={book.id}
+                                android_ripple={{ color: '#ddd' }}
+                                onPress={() =>
+                                    router.push(`/recipes?book_id=${book.id}`)
+                                }
+                            >
+                                <View sx={{ bg: '$muted', p: 'm', mb: 's', borderRadius: 'm' }}>
+                                    <Text variant="heading">{book.name}</Text>
+                                    <Text variant="small">Created: {new Date(book.created_at).toLocaleDateString()}</Text>
+                                </View>
+                            </Pressable>
+                        ))
+                    )
+                }
+            </ScrollView >
+        </View>
     );
 }

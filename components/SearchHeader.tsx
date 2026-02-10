@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react'
-import { Pressable, Animated } from 'react-native'
-import { View, Text, TextInput } from 'dripsy'
 import { Ionicons } from '@expo/vector-icons'
+import { Text, TextInput, View } from 'dripsy'
+import React, { useEffect, useRef } from 'react'
+import { Animated, Pressable } from 'react-native'
 
 type SearchHeaderProps = {
     title: string
@@ -23,6 +23,7 @@ export function SearchHeader({
     searchPlaceholder = 'Search...',
 }: SearchHeaderProps) {
     const searchAnim = useRef(new Animated.Value(0)).current
+    const inputRef = useRef<any>(null)
 
     useEffect(() => {
         Animated.timing(searchAnim, {
@@ -67,7 +68,13 @@ export function SearchHeader({
                 }}
             >
                 <Pressable
-                    onPress={() => setIsSearching(true)}
+                    onPress={() => {
+                        setIsSearching(true)
+                        // Focus search input only when user explicitly opens search
+                        setTimeout(() => {
+                            inputRef.current?.focus()
+                        }, 0)
+                    }}
                     android_ripple={{ color: '#ccc' }}
                     style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
                 >
@@ -78,50 +85,52 @@ export function SearchHeader({
             </Animated.View>
 
             {/* SEARCH BAR */}
-            <Animated.View
-                style={{
-                    position: 'absolute',
-                    right: 0,
-                    left: 110,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    opacity: searchAnim,
-                    transform: [
-                        {
-                            translateX: searchAnim.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [40, 0],
-                            }),
-                        },
-                    ],
-                    pointerEvents: isSearching ? 'auto' : 'none',
-                }}
-            >
-                <TextInput
-                    value={searchQuery}
-                    onChangeText={onSearchChange}
-                    placeholder={searchPlaceholder}
-                    autoFocus
-                    sx={{
-                        flex: 1,
-                        borderWidth: 1,
-                        borderColor: '$border',
-                        borderRadius: 'm',
-                        p: 's',
-                        bg: '$muted',
+            {isSearching && (
+                <Animated.View
+                    style={{
+                        position: 'absolute',
+                        right: 0,
+                        left: 110,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        opacity: searchAnim,
+                        transform: [
+                            {
+                                translateX: searchAnim.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [40, 0],
+                                }),
+                            },
+                        ],
                     }}
-                />
-
-                <Pressable
-                    onPress={() => {
-                        setIsSearching(false)
-                        onSearchChange('')
-                    }}
-                    style={{ marginLeft: 8 }}
                 >
-                    <Ionicons name="close" size={24} color="black" />
-                </Pressable>
-            </Animated.View>
+                    <TextInput
+                        ref={inputRef}
+                        value={searchQuery}
+                        onChangeText={onSearchChange}
+                        placeholder={searchPlaceholder}
+                        sx={{
+                            flex: 1,
+                            borderWidth: 1,
+                            borderColor: '$border',
+                            borderRadius: 'm',
+                            p: 's',
+                            bg: '$muted',
+                        }}
+                    />
+
+                    <Pressable
+                        onPress={() => {
+                            onSearchChange('')
+                            setIsSearching(false)
+                            inputRef.current?.blur()
+                        }}
+                        style={{ marginLeft: 8 }}
+                    >
+                        <Ionicons name="close" size={24} color="black" />
+                    </Pressable>
+                </Animated.View>
+            )}
         </View>
     )
 }

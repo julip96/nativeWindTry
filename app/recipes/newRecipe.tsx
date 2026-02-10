@@ -128,21 +128,17 @@ export default function NewRecipe() {
 
   /** 🔹 Shared input style */
   const inputStyle = (field: string) => ({
-
-
     m: "xs",
     bg: "$background",
     p: Platform.select({ ios: "s", android: "s" }),
     borderRadius: Platform.select({ ios: "m", android: "m" }),
     borderColor: focusedField === field ? "$secondary" : "$primary",
     borderWidth: 2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 3,
-    shadow: "md"
-
-
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.3,
+    // shadowRadius: 10,
+    // elevation: 3,
+    shadow: "md",
   });
 
 
@@ -183,7 +179,7 @@ export default function NewRecipe() {
 
             {/* Cookbook */}
             <Text sx={{ ...titleStyle("book") }}>Cookbook</Text>
-            <View sx={{ ...inputStyle("book"), mb: "m", p: 0 }}>
+            <View sx={{ ...inputStyle("book"), mb: "m", p: 0, }}>
               <Picker
                 selectedValue={selectedBookId}
                 onFocus={() => handleFocus("book")}
@@ -204,23 +200,19 @@ export default function NewRecipe() {
             {ingredients.map((item, index) => (
               <View
                 key={index}
-
-
-
                 sx={{
-
-
                   mb: "s",
                   bg: "$background",
                   p: "s",
                   borderRadius: "m",
                   borderColor: "$primary",
                   borderWidth: 1,
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 10,
-                  elevation: 3,
+                  // shadowColor: "#000",
+                  // shadowOffset: { width: 0, height: 2 },
+                  // shadowOpacity: 0.3,
+                  // shadowRadius: 10,
+                  // elevation: 3,
+                  boxShadow: "md",
                 }}
               >
                 <View sx={{ flexDirection: "row", alignItems: "center" }}>
@@ -296,11 +288,12 @@ export default function NewRecipe() {
                   m: "xs",
                   borderRadius: "m",
                   alignItems: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 10,
-                  elevation: 3,
+                  // shadowColor: "#000",
+                  // shadowOffset: { width: 0, height: 2 },
+                  // shadowOpacity: 0.3,
+                  // shadowRadius: 10,
+                  // elevation: 3,
+                  boxShadow: "md",
                 }}
               >
                 <Text sx={{ color: "$text", fontWeight: "bold" }}>
@@ -335,11 +328,12 @@ export default function NewRecipe() {
                   p: "m",
                   borderRadius: "m",
                   alignItems: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 10,
-                  elevation: 3,
+                  // shadowColor: "#000",
+                  // shadowOffset: { width: 0, height: 2 },
+                  // shadowOpacity: 0.3,
+                  // shadowRadius: 10,
+                  // elevation: 3,
+                  boxShadow: "md",
                 }}
               >
                 <Text sx={{ color: "$text", fontWeight: "bold" }}>Save</Text>
@@ -492,11 +486,12 @@ export default function NewRecipe() {
                   m: "xs",
                   borderRadius: "m",
                   alignItems: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 10,
-                  elevation: 3,
+                  // shadowColor: "#000",
+                  // shadowOffset: { width: 0, height: 2 },
+                  // shadowOpacity: 0.3,
+                  // shadowRadius: 10,
+                  // elevation: 3,
+                  boxShadow: "md",
                 }}
               >
                 <Text sx={{ color: "$text", fontWeight: "bold" }}>
@@ -531,11 +526,12 @@ export default function NewRecipe() {
                   p: "m",
                   borderRadius: "m",
                   alignItems: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 10,
-                  elevation: 3,
+                  // shadowColor: "#000",
+                  // shadowOffset: { width: 0, height: 2 },
+                  // shadowOpacity: 0.3,
+                  // shadowRadius: 10,
+                  // elevation: 3,
+                  boxShadow: "md",
                 }}
               >
                 <Text sx={{ color: "$text", fontWeight: "bold" }}>Save</Text>
