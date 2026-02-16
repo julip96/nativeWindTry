@@ -144,6 +144,7 @@ export default function RecipesListScreen() {
                     </Text>
                 ) : (
                     filteredRecipes.map((recipe) => (
+
                         <View
                             key={recipe.id}
                             sx={{

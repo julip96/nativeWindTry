@@ -6,12 +6,12 @@ import { Platform } from 'react-native'
 const standardColors = {
     $background: '#ffffff',
     $text: '#000000',
-    $primary: '#F4F1BB',
-    $secondary: '#9BC1BC',
+    $primary: '#dcd6f7',
+    $secondary: '#a6b1e1',
     $accent: '#ED6A5A',
     $muted: '#f2e9e4',
     $disabledBackground: '#e6e6e6',
-    $disabledText: '#999999',
+    $disabledText: '#000000',
 }
 
 // --- PINK THEME ---
