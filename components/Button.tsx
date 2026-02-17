@@ -4,7 +4,7 @@ import { Pressable, Text } from "dripsy";
 
 interface ButtonProps {
     title: string;
-    onPress: () => void;
+    onPress?: () => void;
     color?: string;
 }
 

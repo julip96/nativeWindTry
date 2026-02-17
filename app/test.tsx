@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
+import { Alert } from 'react-native';
+
 import { Picker } from "@react-native-picker/picker";
 
-import { Platform } from 'react-native';
 
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { StatusBar } from 'expo-status-bar';
 
@@ -14,7 +15,74 @@ import Box from '../components/Box';
 
 import Button from '../components/Button';
 
+import { supabase } from '@/utils/supabase';
+
 export default function Test() {
+
+    // I will paste functionality from newrecipe screen here
+    const { book_id } = useLocalSearchParams(); // optional vorgegebene Kochbuch-ID
+
+    const [userId, setUserId] = useState<string | null>(null);
+    const [title, setTitle] = useState("");
+    const [instructions, setInstructions] = useState("");
+    const [image, setImage] = useState<string | null>(null);
+
+    // Kochbücher
+    const [books, setBooks] = useState<{ id: string; name: string }[]>([]);
+    const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+
+
+    const handleFocus = (field: string) => {
+        setFocusedField(field);
+    };
+
+    const clearFocus = () => {
+        setFocusedField(null);
+    };
+
+
+
+    // 💾 Save Recipe
+    const handleSaveRecipe = async () => {
+        if (!userId || !selectedBookId)
+            return Alert.alert("Error", "Missing user or cookbook");
+
+        // Zutaten validieren
+        const validIngredients = ingredients
+            .filter((i) => i.name.trim() !== "")
+            .map((i) => ({
+                name: i.name.trim(),
+                amount: i.amount ? parseFloat(i.amount) : null,
+                unit: i.unit || "g",
+            }));
+
+        try {
+            const { data: recipeData, error } = await supabase
+                .from("recipes")
+                .insert([
+                    {
+                        user_id: userId,
+                        book_id: selectedBookId,
+                        title,
+                        instructions,
+                        image_url: image,
+                        ingredients: JSON.stringify(validIngredients),
+                        rating: 0,
+                        private: true,
+                    },
+                ])
+                .select()
+                .single();
+
+            if (error) throw error;
+            Alert.alert("Success", "Recipe saved!");
+            router.back();
+        } catch (e) {
+            console.error("Error saving recipe:", e);
+            Alert.alert("Error", "Could not save recipe.");
+        }
+    };
+
 
     const [focusedField, setFocusedField] = useState<string | null>(null);
 
@@ -63,7 +131,87 @@ export default function Test() {
         <ScrollView sx={{ bg: '$background' }}>
 
 
+            <Box>
+                <Text sx={{}}>Ingredients</Text>
 
+                {/* has shadow */}
+                {ingredients.map((item, index) => (
+                    <View
+                        key={index}
+                        sx={{
+                            mb: "s",
+                            bg: "$background",
+                            p: "s",
+                            borderRadius: "m",
+                            borderColor: "$primary",
+                            borderWidth: 1,
+                            boxShadow: "md",
+                        }}
+                    >
+                        <View sx={{ flexDirection: "row", alignItems: "center" }}>
+                            <TextInput
+                                sx={{
+                                    ...inputStyle(`amt-${index}`),
+                                    width: 70,
+                                    mr: "s",
+                                    textAlign: "center",
+                                    height: "90%",
+                                }}
+                                placeholder="Amt"
+                                value={item.amount}
+                                keyboardType="numeric"
+                                onFocus={() => handleFocus(`amt-${index}`)}
+                                onChangeText={(text) =>
+                                    handleIngredientChange(index, "amount", text)
+                                }
+                            />
+
+                            <View
+                                sx={{
+                                    ...inputStyle(`unit-${index}`),
+                                    width: 120,
+                                    height: "90%",
+                                    mr: "s",
+                                    p: 1,
+                                }}
+                            >
+                                <Picker
+                                    selectedValue={item.unit}
+                                    onFocus={() => handleFocus(`unit-${index}`)}
+                                    onValueChange={(val) => {
+                                        handleIngredientChange(index, "unit", val);
+                                        setFocusedField(null);
+                                    }}
+                                    itemStyle={{ color: "black" }}
+                                >
+                                    {units.map((u) => (
+                                        <Picker.Item key={u} label={u} value={u} />
+                                    ))}
+                                </Picker>
+                            </View>
+
+                            <TextInput
+                                sx={{
+                                    ...inputStyle(`name-${index}`),
+                                    flex: 1,
+                                    height: "90%",
+                                }}
+                                placeholder="Ingredient Name"
+                                value={item.name}
+                                onFocus={() => handleFocus(`name-${index}`)}
+                                onChangeText={(text) =>
+                                    handleIngredientChange(index, "name", text)
+                                }
+                            />
+
+                            <Button title='remove' onPress={handleRemoveIngredient} color='red' />
+                        </View>
+                    </View>
+                ))}
+
+                <Button title='+ Add ingredient' onPress={handleAddIngredientRow()} color='green' />
+
+            </Box>
 
 
             {/* build boxes that look nice. When finish create component */}
@@ -74,49 +222,45 @@ export default function Test() {
 
 
             <Box><Text variant='heading'>Test</Text></Box>
-            <Box flexDir='column'>
-                <Text>Amount</Text>
-                <TextInput placeholder='Type in amount here...' sx={{
-                    width: '50%', boxShadow: 'md', shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.12,
-                    shadowRadius: 6,
-                }} />
-                <Text>Select unit</Text>
+            <Box flexDir='row'>
 
-                <Picker
-                    selectedValue={selectedUnit}
-                    //  onFocus={() => handleFocus(`unit-${index}`)}
-                    onValueChange={(val) => {
-                        //     handleIngredientChange(index, "unit", val);
-                        setFocusedField(null);
-                        setSelectedUnit(val)
-                    }}
-                    itemStyle={{ color: "black" }}
-                    style={{
-                        width: Platform.select({ ios: '20%', android: '20%' }),
-                        boxShadow: 'md',
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.12,
-                        shadowRadius: 6,
-                        elevation: 1,
+                <View sx={{ flexDirection: 'column', flex: 1, p: 's' }}>
+                    <Text>Amount</Text>
+                    <TextInput placeholder='Type in amount here...' sx={{
+                        flex: 1, borderColor: '$primary', borderRadius: 5, borderWidth: 5
+                    }} />
+                </View>
 
-                    }}
-                >
-                    {units.map((u) => (
-                        <Picker.Item key={u} label={u} value={u} />
-                    ))}
+                <View sx={{ flexDirection: 'column', flex: 2, p: 's' }}>
+                    <Text>Unit</Text>
+                    <Picker
+                        selectedValue={selectedUnit}
+                        //  onFocus={() => handleFocus(`unit-${index}`)}
+                        onValueChange={(val) => {
+                            //     handleIngredientChange(index, "unit", val);
+                            setFocusedField(null);
+                            setSelectedUnit(val)
+                        }}
+                        itemStyle={{ color: "black" }}
+                        style={{
+                            // width: Platform.select({ ios: '20%', android: '20%' }),
+                            flex: 1
+                            , width: '50%'
+                        }}
+                    >
+                        {units.map((u) => (
+                            <Picker.Item key={u} label={u} value={u} />
+                        ))}
 
-                </Picker>
-                <Text>Name</Text>
-                {/* Ingredient name and amount */}
-                <TextInput placeholder='Type in ingredient name here...' sx={{
-                    width: '50%', shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.12,
-                    shadowRadius: 6, boxShadow: 'md'
-                }} />
+                    </Picker>
+                </View>
+                <View sx={{ flexDirection: 'column', flex: 1, p: 's' }}>
+                    <Text>Name</Text>
+                    {/* Ingredient name and amount */}
+                    <TextInput placeholder='Type in ingredient name here...' sx={{
+                        flex: 1, borderColor: '$primary', borderRadius: 5, borderWidth: 5
+                    }} />
+                </View>
 
             </Box>
 
