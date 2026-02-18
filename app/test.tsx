@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Picker } from "@react-native-picker/picker";
 
-import { Platform } from 'react-native';
+import { Animated, Platform } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
@@ -16,7 +16,7 @@ import Button from '../components/Button';
 
 export default function Test() {
 
-    const [focusedField, setFocusedField] = useState<string | null>(null);
+    const [isFocused, setIsFocused] = useState(false);
 
     const [ingredientName, setIngredientName] = useState("banana");
 
@@ -52,11 +52,25 @@ export default function Test() {
 
     const router = useRouter();
 
-    const inputStyle = (field: string) => ({
-        borderColor: focusedField === field ? "$secondary" : "$primary",
-    })
 
     const bc = "white"
+    const [text, setText] = useState('')
+
+    // function for testing textinput style
+    const borderAnim = useRef(new Animated.Value(0)).current;
+    useEffect(() => {
+        Animated.timing(borderAnim, {
+            toValue: isFocused ? 1 : 0,
+            duration: 200,
+            useNativeDriver: false,
+        }).start();
+    }, [isFocused]);
+    const borderColor = borderAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['transparent', '#007AFF'],
+    });
+
+    const showLabel = isFocused || text.length > 0;
 
     return (
 
@@ -74,7 +88,125 @@ export default function Test() {
 
 
             <Box><Text variant='heading'>Test</Text></Box>
+
+            <Box>           <TextInput
+                placeholder="Type in name here"
+                placeholderTextColor="#999"
+                value={text}
+                onChangeText={setText}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                style={{
+                    borderWidth: 2,
+                    borderColor: isFocused ? '#007AFF' : '#ccc', // Blau beim Fokus
+                    borderRadius: 12,
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    fontSize: 16,
+                    color: '#000',
+                    // Schatten nur beim Fokus
+                    shadowColor: isFocused ? '#007AFF' : 'transparent',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: isFocused ? 0.3 : 0,
+                    shadowRadius: 4,
+                    elevation: isFocused ? 3 : 0,
+                }}
+            />
+            </Box>
+
+            <Box>
+
+                <TextInput
+                    placeholder="Type in name here"
+                    placeholderTextColor="#999"
+                    value={text}
+                    onChangeText={setText}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    style={{
+                        borderBottomWidth: 1,
+                        borderBottomColor: isFocused ? '#007AFF' : '#ccc',
+                        paddingVertical: 8,
+                        fontSize: 16,
+                        color: '#000',
+                    }}
+                />
+            </Box>
+
+
+
+            <Box>
+                <Animated.View
+                    style={{
+                        borderWidth: 2,
+                        borderRadius: 12,
+                        borderColor,
+                    }}
+                >
+                    <TextInput
+                        placeholder="Type in name here"
+                        placeholderTextColor="#999"
+                        value={text}
+                        onChangeText={setText}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        style={{
+                            padding: 12,
+                            fontSize: 16,
+                            color: '#000',
+                        }}
+                    />
+                </Animated.View>
+            </Box>
+
+            <Box>
+                <View
+                    style={{
+                        borderWidth: 2,
+                        borderColor: isFocused ? '#007AFF' : '#ccc',
+                        borderRadius: 12,
+                        paddingHorizontal: 12,
+                        paddingTop: 18,
+                        paddingBottom: 8,
+                        position: 'relative',
+                    }}
+                >
+                    {showLabel && (
+                        <Text
+                            style={{
+                                position: 'absolute',
+                                left: 12,
+                                top: 6,
+                                fontSize: 12,
+                                color: isFocused ? '#007AFF' : '#999',
+                            }}
+                        >
+                            Name
+                        </Text>
+                    )}
+                    <TextInput
+                        placeholder={showLabel ? '' : 'Name'}
+                        placeholderTextColor="#999"
+                        value={text}
+                        onChangeText={setText}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        style={{
+                            fontSize: 16,
+                            color: '#000',
+                            padding: 0,
+                            margin: 0,
+                        }}
+                    />
+                </View>
+
+            </Box>
+
             <Box flexDir='column'>
+
+                <Text>___________________________________</Text>
+                {/* User input for a new ingredient */}
+
                 <Text>Amount</Text>
                 <TextInput placeholder='Type in amount here...' sx={{
                     width: '50%', boxShadow: 'md', shadowColor: '#000',
@@ -82,14 +214,19 @@ export default function Test() {
                     shadowOpacity: 0.12,
                     shadowRadius: 6,
                 }} />
+
+
+
+
+
+
                 <Text>Select unit</Text>
 
                 <Picker
                     selectedValue={selectedUnit}
-                    //  onFocus={() => handleFocus(`unit-${index}`)}
                     onValueChange={(val) => {
                         //     handleIngredientChange(index, "unit", val);
-                        setFocusedField(null);
+                        setIsFocused(false);
                         setSelectedUnit(val)
                     }}
                     itemStyle={{ color: "black" }}

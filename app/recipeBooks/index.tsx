@@ -1,3 +1,5 @@
+import Box from '@/components/Box';
+import Button from '@/components/Button';
 import { ScrollView, Text, View } from 'dripsy';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -74,80 +76,84 @@ export default function RecipeBooksScreen() {
 
     return (
 
-        <View sx={{ flex: 1, bg: '$background', p: 'm' }}>
+        <ScrollView
+            sx={{
+                flex: 1,
+                bg: '$background',
+            }}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            onScrollBeginDrag={() => {
+                if (isSearching) {
+                    setIsSearching(false);
+                    setSearchQuery('');
+                }
+                Keyboard.dismiss();
+            }}
+            onTouchStart={() => {
+                if (isSearching) {
+                    setIsSearching(false);
+                    setSearchQuery('');
+                }
+            }}
+        >
 
-            <ScrollView
-                sx={{ flex: 1 }}
-                keyboardShouldPersistTaps="handled"
-                keyboardDismissMode="on-drag"
-                onScrollBeginDrag={() => {
-                    if (isSearching) {
-                        setIsSearching(false);
-                        setSearchQuery('');
-                    }
-                    Keyboard.dismiss();
-                }}
-                onTouchStart={() => {
-                    if (isSearching) {
-                        setIsSearching(false);
-                        setSearchQuery('');
-                    }
-                }}
-            >
-
-                <SearchHeader
-                    title="Recipe Books"
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    isSearching={isSearching}
-                    setIsSearching={setIsSearching}
-                    searchPlaceholder="Search books..."
-                    rightAction={
-                        <Pressable
-                            onPress={() => router.push('/recipeBooks/newBook')}
-                            android_ripple={{ color: '#ccc' }}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+            <SearchHeader
+                title="Recipe Books"
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                isSearching={isSearching}
+                setIsSearching={setIsSearching}
+                searchPlaceholder="Search books..."
+                rightAction={
+                    <Pressable
+                        onPress={() => router.push('/recipeBooks/newBook')}
+                        android_ripple={{ color: '#ccc' }}
+                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+                    >
+                        <View
+                            sx={{
+                                bg: '$primary',
+                                px: 'm',
+                                py: 's',
+                                borderRadius: 'm',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
                         >
-                            <View
-                                sx={{
-                                    bg: '$primary',
-                                    px: 'm',
-                                    py: 's',
-                                    borderRadius: 'm',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Text sx={{ color: "$text", fontWeight: 'bold' }}>
-                                    + New
-                                </Text>
-                            </View>
-                        </Pressable>
-                    }
-                />
+                            <Text sx={{ color: "$text", fontWeight: 'bold' }}>
+                                + New
+                            </Text>
+                        </View>
+                    </Pressable>
+                }
+            />
 
-                {/* Book list */}
-                {
-                    filteredBooks.length === 0 ? (
-                        <Text>No recipe books found.</Text>
-                    ) : (
-                        filteredBooks.map((book) => (
-                            <Pressable
-                                key={book.id}
-                                android_ripple={{ color: '#ddd' }}
+            {/* Book list */}
+            {
+                filteredBooks.length === 0 ? (
+                    <Text>No recipe books found.</Text>
+                ) : (
+                    filteredBooks.map((book) => (
+                        <Box key={book.id}>
+                            <View sx={{ bg: '$background', p: 'xs', mb: 's', borderRadius: 'm' }}>
+                                <Text variant="heading">{book.name}</Text>
+                                <Text variant="small">Created: {new Date(book.created_at).toLocaleDateString()}</Text>
+                            </View>
+
+                            <Button
+                                color='$primary'
+                                title='View'
                                 onPress={() =>
                                     router.push(`/recipes?book_id=${book.id}`)
                                 }
                             >
-                                <View sx={{ bg: '$muted', p: 'm', mb: 's', borderRadius: 'm' }}>
-                                    <Text variant="heading">{book.name}</Text>
-                                    <Text variant="small">Created: {new Date(book.created_at).toLocaleDateString()}</Text>
-                                </View>
-                            </Pressable>
-                        ))
-                    )
-                }
-            </ScrollView >
-        </View>
+
+                            </Button>
+                        </Box>
+                    ))
+                )
+            }
+        </ScrollView >
     );
 }

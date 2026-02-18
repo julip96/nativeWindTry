@@ -126,15 +126,7 @@ export default function NewRecipe() {
 
 
 
-  /** 🔹 Shared input style */
-  const inputStyle = (field: string) => ({
-    m: "xs",
-    bg: "$background",
-    p: Platform.select({ ios: "m", android: "s" }),
-    borderRadius: Platform.select({ ios: "m", android: "m" }),
-    borderColor: focusedField === field ? "$secondary" : "$primary",
-    borderWidth: 2,
-  });
+
 
 
   const titleStyle = (field: string) => ({
@@ -160,7 +152,6 @@ export default function NewRecipe() {
 
             {/* Title */}
             <View sx={{
-              ...inputStyle("title"),
               bg: "$background",
               p: "s",
               borderRadius: "m",
@@ -174,7 +165,7 @@ export default function NewRecipe() {
                 sx={{
                   mb: "m",
                   color: "$accent",
-                  fontWeight: 900
+                  fontWeight: 600
                 }}
                 placeholder="e.g. Creamy Mushroom Pasta"
                 value={title}
@@ -185,7 +176,6 @@ export default function NewRecipe() {
             {/* Cookbook */}
 
             <View sx={{
-              ...inputStyle("book"),
               mb: "s",
               bg: "$background",
               p: "s",
@@ -220,7 +210,6 @@ export default function NewRecipe() {
 
             {/* 🧂 Zutaten */}
             <View sx={{
-              ...inputStyle("ingredients"),
               mb: "s",
               bg: "$background",
               p: "s",
@@ -248,7 +237,6 @@ export default function NewRecipe() {
                   <View sx={{ flexDirection: "row", alignItems: "center" }}>
                     <TextInput
                       sx={{
-                        ...inputStyle(`amt-${index}`),
                         width: 70,
                         mr: "s",
                         textAlign: "center",
@@ -265,7 +253,6 @@ export default function NewRecipe() {
 
                     <View
                       sx={{
-                        ...inputStyle(`unit-${index}`),
                         width: 120,
                         height: "90%",
                         mr: "s",
@@ -289,7 +276,6 @@ export default function NewRecipe() {
 
                     <TextInput
                       sx={{
-                        ...inputStyle(`name-${index}`),
                         flex: 1,
                         height: "90%",
                       }}
@@ -319,11 +305,6 @@ export default function NewRecipe() {
                     m: "xs",
                     borderRadius: "m",
                     alignItems: "center",
-                    // shadowColor: "#000",
-                    // shadowOffset: { width: 0, height: 2 },
-                    // shadowOpacity: 0.3,
-                    // shadowRadius: 10,
-                    // elevation: 3,
                     boxShadow: "md",
                   }}
                 >
@@ -335,7 +316,6 @@ export default function NewRecipe() {
             </View>
             {/* 🧂 Zutaten Style testen!*/}
             <View sx={{
-              ...inputStyle("ingredients"),
               mb: "s",
               bg: "$background",
               p: "s",
@@ -362,7 +342,6 @@ export default function NewRecipe() {
                 >
                   <TextInput
                     sx={{
-                      ...inputStyle(`name-${index}`),
                       flex: 1,
                       height: "1%",
                       width: "100%"
@@ -377,7 +356,6 @@ export default function NewRecipe() {
                   <View sx={{ flexDirection: "column", alignItems: "center" }}>
                     <TextInput
                       sx={{
-                        ...inputStyle(`amt-${index}`),
                         width: "100%",
                         textAlign: "left",
                         height: "1%",
@@ -393,7 +371,6 @@ export default function NewRecipe() {
 
                     <View
                       sx={{
-                        ...inputStyle(`unit-${index}`),
                         width: "100%",
                         height: "50%",
                       }}
@@ -431,11 +408,6 @@ export default function NewRecipe() {
                     p: "m",
                     borderRadius: "m",
                     alignItems: "center",
-                    // shadowColor: "#000",
-                    // shadowOffset: { width: 0, height: 2 },
-                    // shadowOpacity: 0.3,
-                    // shadowRadius: 10,
-                    // elevation: 3,
                     boxShadow: "md",
                   }}
                 >
@@ -452,7 +424,6 @@ export default function NewRecipe() {
             </Text>
             <TextInput
               sx={{
-                ...inputStyle("instructions"),
                 minHeight: 120,
                 textAlignVertical: "top",
                 mb: "m",
@@ -472,11 +443,6 @@ export default function NewRecipe() {
                   p: "m",
                   borderRadius: "m",
                   alignItems: "center",
-                  // shadowColor: "#000",
-                  // shadowOffset: { width: 0, height: 2 },
-                  // shadowOpacity: 0.3,
-                  // shadowRadius: 10,
-                  // elevation: 3,
                   boxShadow: "md",
                 }}
               >
@@ -506,7 +472,6 @@ export default function NewRecipe() {
             <Text sx={{ ...titleStyle("title") }}>Recipe Title</Text>
             <TextInput
               sx={{
-                ...inputStyle("title"),
                 mb: "m",
               }}
               placeholder="e.g. Creamy Mushroom Pasta"
@@ -517,7 +482,7 @@ export default function NewRecipe() {
 
             {/* Cookbook */}
             <Text sx={{ ...titleStyle("book") }}>Cookbook</Text>
-            <View sx={{ ...inputStyle("book"), mb: "m", p: 0 }}>
+            <View sx={{ mb: "m", p: 0 }}>
               <Picker
                 selectedValue={selectedBookId}
                 onFocus={() => handleFocus("book")}
@@ -560,7 +525,6 @@ export default function NewRecipe() {
                 <View sx={{ flexDirection: "row", alignItems: "center" }}>
                   <TextInput
                     sx={{
-                      ...inputStyle(`amt-${index}`),
                       width: 70,
                       mr: "s",
                       textAlign: "center",
@@ -577,7 +541,6 @@ export default function NewRecipe() {
 
                   <View
                     sx={{
-                      ...inputStyle(`unit-${index}`),
                       width: 120,
                       height: "90%",
                       mr: "s",
@@ -600,7 +563,6 @@ export default function NewRecipe() {
 
                   <TextInput
                     sx={{
-                      ...inputStyle(`name-${index}`),
                       flex: 1,
                       height: "90%",
                     }}
@@ -630,11 +592,6 @@ export default function NewRecipe() {
                   m: "xs",
                   borderRadius: "m",
                   alignItems: "center",
-                  // shadowColor: "#000",
-                  // shadowOffset: { width: 0, height: 2 },
-                  // shadowOpacity: 0.3,
-                  // shadowRadius: 10,
-                  // elevation: 3,
                   boxShadow: "md",
                 }}
               >
@@ -650,7 +607,6 @@ export default function NewRecipe() {
             </Text>
             <TextInput
               sx={{
-                ...inputStyle("instructions"),
                 minHeight: 120,
                 textAlignVertical: "top",
                 mb: "m",
@@ -670,11 +626,6 @@ export default function NewRecipe() {
                   p: "m",
                   borderRadius: "m",
                   alignItems: "center",
-                  // shadowColor: "#000",
-                  // shadowOffset: { width: 0, height: 2 },
-                  // shadowOpacity: 0.3,
-                  // shadowRadius: 10,
-                  // elevation: 3,
                   boxShadow: "md",
                 }}
               >

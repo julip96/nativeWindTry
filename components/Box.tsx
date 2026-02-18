@@ -6,10 +6,11 @@ import { View } from 'dripsy';
 
 interface BoxProps {
     children?: ReactNode;
-    flexDir?: string
+    flexDir?: string;
+    [key: string]: any;
 }
 
-export default function Box({ children, flexDir }: BoxProps) {
+export default function Box({ children, flexDir, ...rest }: BoxProps) {
     return (
         <View sx={{
             m: "s",
@@ -22,7 +23,11 @@ export default function Box({ children, flexDir }: BoxProps) {
             shadowColor: "black",
             borderColor: "$background",
             flexDirection: flexDir
-        }}>{children}</View>
+        }}
+            {...rest}
+        >
+            {children}
+        </View>
 
     )
 };
