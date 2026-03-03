@@ -8,6 +8,8 @@ interface UserInputProps {
   validate?: (text: string) => true | string;
   showLabel?: boolean;
   placeholder?: string;
+  multiline?: boolean;
+  onFocus?: () => void;
 }
 
 const UserInput: React.FC<UserInputProps> = ({
@@ -17,6 +19,8 @@ const UserInput: React.FC<UserInputProps> = ({
   validate,
   showLabel = true,
   placeholder = '',
+  multiline = false,
+  onFocus,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +47,7 @@ const UserInput: React.FC<UserInputProps> = ({
 
   return (
     <>
-      <View style={[styles.container, { borderColor }]}>
+      <View style={[styles.container, { borderColor, paddingBottom: multiline ? 12 : 8 }]}>
         {showLabel && label && (
           <Text style={[styles.label, { color: labelColor }]}>
             {label}
@@ -59,9 +63,15 @@ const UserInput: React.FC<UserInputProps> = ({
               setError(null);
             }
           }}
-          onFocus={() => setIsFocused(true)}
+          onFocus={() => {
+            setIsFocused(true)
+            if (onFocus) onFocus();
+          }}
+
           onBlur={handleBlur}
-          style={styles.input}
+          style={[styles.input, multiline && styles.multilineInput]}
+          multiline={multiline}
+          textAlignVertical={multiline ? 'top' : 'auto'} // Damit Text oben beginnt bei multiline}
         />
       </View>
       {/* Fehlertext außerhalb des Containers */}
@@ -93,6 +103,9 @@ const styles = StyleSheet.create({
     color: '#000',
     padding: 0,
     margin: 0,
+  },
+  multilineInput: {
+    minHeight: 100, // Größeres Textfeld für mehrzeilige Eingabe
   },
   errorContainer: {
     minHeight: 18, // Höhe reservieren, damit Layout nicht springt

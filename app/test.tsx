@@ -132,7 +132,7 @@ export default function Test() {
 
 
 
-            <Box>
+            <Box flexDir='column'>
                 <UserInput
                     label="Name"
                     placeholder="Type in ingredient name here"
