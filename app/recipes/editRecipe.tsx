@@ -186,8 +186,6 @@ export default function EditRecipeScreen() {
         }
     }
 
-    console.log("ingredients:", ingredients);
-
     return (
         <ScrollView sx={{ p: "m", bg: "$background", flex: 1 }}>
             <View>
@@ -264,10 +262,11 @@ export default function EditRecipeScreen() {
                     <PhotoPickerBox onChange={setImage} uri={image} />
                 )}
 
-                {/* 🧂 Ingredients */}
-                <Text sx={{ fontWeight: "bold", mt: "m", mb: "s" }}>Ingredients
 
-                </Text>
+
+
+                {/* 🧂 Ingredients */}
+                <Text sx={{ fontWeight: "bold", mt: "m", mb: "s" }}>Ingredients</Text>
 
                 {ingredients.map((item, index) => (
                     <View
@@ -309,15 +308,12 @@ export default function EditRecipeScreen() {
                                 mr: "s",
                             }}
                         >
-
-
                             <Picker
                                 selectedValue={
-                                    item && item.unit && ["g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"].includes(item.unit)
+                                    ["g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"].includes(item.unit)
                                         ? item.unit
-                                        : ""
+                                        : "" // fallback if stored unit is slightly different (e.g., "piece")
                                 }
-                                key={index} // force re-render when index changes
                                 onValueChange={(value) => handleIngredientChange(index, "unit", value)}
                                 style={{
                                     height: 40,
@@ -335,7 +331,7 @@ export default function EditRecipeScreen() {
                                 <Picker.Item label="tsp" value="tsp" color="#000" />
                                 <Picker.Item label="tbsp" value="tbsp" color="#000" />
                                 <Picker.Item label="cup" value="cup" color="#000" />
-                                <Picker.Item label="pcs" value="pcs" color="#000" />
+                                <Picker.Item label="piece" value="piece" color="#000" /> {/* instead of "pcs" */}
                             </Picker>
                         </View>
 

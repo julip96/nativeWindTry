@@ -1,4 +1,3 @@
-import Box from '@/components/Box'
 import { ScrollView, Text, View } from 'dripsy'
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
@@ -6,6 +5,7 @@ import React from 'react'
 import { Animated, Image, Keyboard, Pressable } from 'react-native'
 import { SearchHeader } from '../../components/SearchHeader'
 import { supabase } from '../../utils/supabase'
+
 
 
 export default function RecipesListScreen() {
@@ -84,110 +84,116 @@ export default function RecipesListScreen() {
 
 
     return (
-        <ScrollView
-            sx={{ flex: 1, bg: '$background' }}
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="on-drag"
-            onScrollBeginDrag={() => {
-                if (isSearching) {
-                    setIsSearching(false)
-                    setSearchQuery('')
-                }
-                Keyboard.dismiss()
-            }}
-            onTouchStart={() => {
-                if (isSearching) {
-                    setIsSearching(false)
-                    setSearchQuery('')
-                }
-            }}
-        >
-            {/* Heading and Button in one line */}
-            <SearchHeader
-                title={title}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                isSearching={isSearching}
-                setIsSearching={setIsSearching}
-                searchPlaceholder="Search recipes..."
-                rightAction={
-                    <Pressable
-                        onPress={() =>
-                            router.push(`/recipes/newRecipe${book_id ? `?book_id=${book_id}` : ''}`)
-                        }
-                    >
-                        <View
-                            sx={{
-                                bg: '$primary',
-                                px: 'm',
-                                py: 's',
-                                borderRadius: 'm',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <Text style={{ color: "$text", fontWeight: 'bold' }}>
-                                + New
-                            </Text>
-                        </View>
-                    </Pressable>
-                }
-            />
-
-            {/* Recipe cards */}
-            {loading ? (
-                <Text>Loading recipes...</Text>
-            ) : filteredRecipes.length === 0 ? (
-                <Text>
-                    {book_id ? 'No recipes found in this book.' : 'No recipes found.'}
-                </Text>
-            ) : (
-                filteredRecipes.map((recipe) => (
-
-                    <Box
-                        key={recipe.id}
-                    >
-                        <Text variant="heading">{recipe.title}</Text>
-
-                        {recipe.image_url ? (
-                            <Image
-                                source={{ uri: recipe.image_url }}
-                                style={{
-                                    width: '100%',
-                                    height: 120,
-                                    borderRadius: 10,
-                                    marginBottom: 8,
-                                    marginTop: 4,
-                                }}
-                                resizeMode="cover"
-                            />
-                        ) : null}
-
+        <View sx={{ flex: 1, bg: '$background', p: 'm' }}>
+            <ScrollView
+                sx={{ flex: 1 }}
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
+                onScrollBeginDrag={() => {
+                    if (isSearching) {
+                        setIsSearching(false)
+                        setSearchQuery('')
+                    }
+                    Keyboard.dismiss()
+                }}
+                onTouchStart={() => {
+                    if (isSearching) {
+                        setIsSearching(false)
+                        setSearchQuery('')
+                    }
+                }}
+            >
+                {/* Heading and Button in one line */}
+                <SearchHeader
+                    title={title}
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    isSearching={isSearching}
+                    setIsSearching={setIsSearching}
+                    searchPlaceholder="Search recipes..."
+                    rightAction={
                         <Pressable
-                            android_ripple={{ color: '#ccc' }}
-                            onPress={() => router.push(`/recipes/${recipe.id}`)}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+                            onPress={() =>
+                                router.push(`/recipes/newRecipe${book_id ? `?book_id=${book_id}` : ''}`)
+                            }
                         >
                             <View
                                 sx={{
                                     bg: '$primary',
-                                    p: 'm',
+                                    px: 'm',
+                                    py: 's',
                                     borderRadius: 'm',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    mt: 's',
                                 }}
                             >
-                                <Text sx={{ color: "$text", fontWeight: 'bold' }}>View</Text>
+                                <Text style={{ color: "$text", fontWeight: 'bold' }}>
+                                    + New
+                                </Text>
                             </View>
                         </Pressable>
-                    </Box>
+                    }
+                />
 
+                {/* Recipe cards */}
+                {loading ? (
+                    <Text>Loading recipes...</Text>
+                ) : filteredRecipes.length === 0 ? (
+                    <Text>
+                        {book_id ? 'No recipes found in this book.' : 'No recipes found.'}
+                    </Text>
+                ) : (
+                    filteredRecipes.map((recipe) => (
 
-                ))
-            )}
+                        <View
+                            key={recipe.id}
+                            sx={{
+                                bg: '$muted',
+                                p: 'm',
+                                mb: 's',
+                                borderRadius: 'm',
+                            }}
+                        >
+                            <Text variant="heading">{recipe.title}</Text>
 
-            <StatusBar style="dark" />
-        </ScrollView>
+                            {recipe.image_url ? (
+                                <Image
+                                    source={{ uri: recipe.image_url }}
+                                    style={{
+                                        width: '100%',
+                                        height: 120,
+                                        borderRadius: 10,
+                                        marginBottom: 8,
+                                        marginTop: 4,
+                                    }}
+                                    resizeMode="cover"
+                                />
+                            ) : null}
+
+                            <Pressable
+                                android_ripple={{ color: '#ccc' }}
+                                onPress={() => router.push(`/recipes/${recipe.id}`)}
+                                style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+                            >
+                                <View
+                                    sx={{
+                                        bg: '$primary',
+                                        p: 'm',
+                                        borderRadius: 'm',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        mt: 's',
+                                    }}
+                                >
+                                    <Text sx={{ color: "$text", fontWeight: 'bold' }}>View</Text>
+                                </View>
+                            </Pressable>
+                        </View>
+                    ))
+                )}
+
+                <StatusBar style="dark" />
+            </ScrollView>
+        </View>
     )
 }

@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { Alert } from 'react-native';
 
 import { Picker } from "@react-native-picker/picker";
 
-import { Animated, Platform } from 'react-native';
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
@@ -16,54 +15,80 @@ import Box from '../components/Box';
 
 import Button from '../components/Button';
 
-import UserInput from '@/components/UserInput';
+import { supabase } from '@/utils/supabase';
 
 export default function Test() {
 
-    const [isFocused, setIsFocused] = useState(false);
+    // I will paste functionality from newrecipe screen here
+    const { book_id } = useLocalSearchParams(); // optional vorgegebene Kochbuch-ID
 
-    const [focusedInput, setFocusedInput] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
+    const [title, setTitle] = useState("");
+    const [instructions, setInstructions] = useState("");
+    const [image, setImage] = useState<string | null>(null);
 
-    const [values, setValues] = useState({
-        underline: '',
-        boxed: '',
-        animated: '',
-        floating: '',
-        glow: '',
-        design1: '',
-        design2: '',
-        design3: '',
-        design4: '',
-    });
+    // Kochbücher
+    const [books, setBooks] = useState<{ id: string; name: string }[]>([]);
+    const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
-    const validateName = (text: string) => {
-        if (!text || text.trim().length === 0) return 'Name darf nicht leer sein';
-        if (text.length < 3) return 'Name muss mindestens 3 Zeichen lang sein';
-        return true;
+
+    const handleFocus = (field: string) => {
+        setFocusedField(field);
     };
 
-    const validateAmount = (text: string) => {
-        if (!text || text.trim().length === 0) return 'Amount darf nicht leer sein';
-
-        // Prüfen, ob nur Zahlen (0-9) eingegeben wurden
-        const numberOnlyRegex = /^[0-9]+$/;
-        if (!numberOnlyRegex.test(text)) return 'Bitte nur Zahlen eingeben';
-
-        if (text.length < 1) return 'Amount muss mindestens 1 Zeichen lang sein';
-
-        return true;
+    const clearFocus = () => {
+        setFocusedField(null);
     };
 
 
-    const [name, setName] = useState('');
 
-    const handleChange = (key: string, text: string) => {
-        setValues(v => ({ ...v, [key]: text }));
+    // 💾 Save Recipe
+    const handleSaveRecipe = async () => {
+        if (!userId || !selectedBookId)
+            return Alert.alert("Error", "Missing user or cookbook");
+
+        // Zutaten validieren
+        const validIngredients = ingredients
+            .filter((i) => i.name.trim() !== "")
+            .map((i) => ({
+                name: i.name.trim(),
+                amount: i.amount ? parseFloat(i.amount) : null,
+                unit: i.unit || "g",
+            }));
+
+        try {
+            const { data: recipeData, error } = await supabase
+                .from("recipes")
+                .insert([
+                    {
+                        user_id: userId,
+                        book_id: selectedBookId,
+                        title,
+                        instructions,
+                        image_url: image,
+                        ingredients: JSON.stringify(validIngredients),
+                        rating: 0,
+                        private: true,
+                    },
+                ])
+                .select()
+                .single();
+
+            if (error) throw error;
+            Alert.alert("Success", "Recipe saved!");
+            router.back();
+        } catch (e) {
+            console.error("Error saving recipe:", e);
+            Alert.alert("Error", "Could not save recipe.");
+        }
     };
 
-    const [ingredientName, setIngredientName] = useState('');
 
-    const [ingredientAmount, setIngredientAmount] = useState('');
+    const [focusedField, setFocusedField] = useState<string | null>(null);
+
+    const [ingredientName, setIngredientName] = useState("banana");
+
+    const [ingredientAmount, setIngredientAmount] = useState("0");
 
     const units = ["-", "g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"];
 
@@ -95,26 +120,11 @@ export default function Test() {
 
     const router = useRouter();
 
+    const inputStyle = (field: string) => ({
+        borderColor: focusedField === field ? "$secondary" : "$primary",
+    })
 
     const bc = "white"
-    const [text, setText] = useState('')
-
-    // function for testing textinput style
-    const borderAnim = useRef(new Animated.Value(0)).current;
-    useEffect(() => {
-        Animated.timing(borderAnim, {
-            toValue: isFocused ? 1 : 0,
-            duration: 200,
-            useNativeDriver: false,
-        }).start();
-    }, [isFocused]);
-
-    const borderColor = borderAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['transparent', '#007AFF'],
-    });
-
-    const showLabel = isFocused || text.length > 0;
 
     return (
 
@@ -207,52 +217,52 @@ export default function Test() {
             {/* build boxes that look nice. When finish create component */}
 
             <Box><Text variant='heading'>Schatten</Text></Box>
-
             <Box><Text variant='heading'>Schatten</Text></Box>
             <Box><Text variant='heading'>Schatten</Text></Box>
 
 
+            <Box><Text variant='heading'>Test</Text></Box>
+            <Box flexDir='row'>
 
+                <View sx={{ flexDirection: 'column', flex: 1, p: 's' }}>
+                    <Text>Amount</Text>
+                    <TextInput placeholder='Type in amount here...' sx={{
+                        flex: 1, borderColor: '$primary', borderRadius: 5, borderWidth: 5
+                    }} />
+                </View>
 
-            <Box flexDir='column'>
-                <UserInput
-                    label="Name"
-                    placeholder="Type in ingredient name here"
-                    value={ingredientName}
-                    onChangeText={setIngredientName}
-                    validate={validateName}
-                />
-                <UserInput
-                    label="Amount"
-                    placeholder="Type in amount here"
-                    value={ingredientAmount}
-                    onChangeText={setIngredientAmount}
-                    validate={validateAmount}
-                />
+                <View sx={{ flexDirection: 'column', flex: 2, p: 's' }}>
+                    <Text>Unit</Text>
+                    <Picker
+                        selectedValue={selectedUnit}
+                        //  onFocus={() => handleFocus(`unit-${index}`)}
+                        onValueChange={(val) => {
+                            //     handleIngredientChange(index, "unit", val);
+                            setFocusedField(null);
+                            setSelectedUnit(val)
+                        }}
+                        itemStyle={{ color: "black" }}
+                        style={{
+                            // width: Platform.select({ ios: '20%', android: '20%' }),
+                            flex: 1
+                            , width: '50%'
+                        }}
+                    >
+                        {units.map((u) => (
+                            <Picker.Item key={u} label={u} value={u} />
+                        ))}
 
-                <Picker
-                    selectedValue={selectedUnit}
-                    onValueChange={(val) => {
-                        //     handleIngredientChange(index, "unit", val);
-                        setIsFocused(false);
-                        setSelectedUnit(val)
-                    }}
-                    itemStyle={{ color: "black" }}
-                    style={{
-                        width: Platform.select({ ios: '100%', android: '100%' }),
-
-
-                    }}
-                >
-                    {units.map((u) => (
-                        <Picker.Item key={u} label={u} value={u} />
-                    ))}
-
-                </Picker>
+                    </Picker>
+                </View>
+                <View sx={{ flexDirection: 'column', flex: 1, p: 's' }}>
+                    <Text>Name</Text>
+                    {/* Ingredient name and amount */}
+                    <TextInput placeholder='Type in ingredient name here...' sx={{
+                        flex: 1, borderColor: '$primary', borderRadius: 5, borderWidth: 5
+                    }} />
+                </View>
 
             </Box>
-
-
 
             <Box><Text>{ingredientAmount} {selectedUnit} of {ingredientName}  </Text></Box>
             <View>
