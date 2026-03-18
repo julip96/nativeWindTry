@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Text, TextInput, View } from 'dripsy'
 import React, { useEffect, useRef } from 'react'
-import { Animated, Pressable } from 'react-native'
+import { Animated, Platform, Pressable } from 'react-native'
 
 type SearchHeaderProps = {
     title: string
@@ -35,10 +35,13 @@ export function SearchHeader({
 
     return (
         <View
-            style={{
+            sx={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginBottom: 16,
+                m: "s",
+                mt: "xs",
+                bg: "$background",
+                p: Platform.select({ ios: "m", android: "s" }),
             }}
         >
             {/* TITLE */}

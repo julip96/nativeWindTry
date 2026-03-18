@@ -1,16 +1,13 @@
-import React from 'react'
-import { View, Text, H1, ScrollView } from 'dripsy'
-import { StatusBar } from 'expo-status-bar'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useThemeMode } from '../components/ThemeProvider'
 import { useSession } from '@/components/SessionProvider'
+import { H1, ScrollView, View } from 'dripsy'
+import { StatusBar } from 'expo-status-bar'
+import React from 'react'
+import { useThemeMode } from '../components/ThemeProvider'
 
-import { ThemeCard } from '../components/ThemeCard'
-import { ThemeButton } from '../components/ThemeButton'
+import Button from '@/components/Button'
+import { Alert } from 'react-native'
 import Account from '../components/Account'
 import { supabase } from '../utils/supabase'
-import { Alert } from 'react-native'
-
 
 export default function SettingsScreen() {
     const session = useSession()
@@ -36,89 +33,60 @@ export default function SettingsScreen() {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <ScrollView>
 
-                {/* ---------- Profile Card ---------- */}
-                <ThemeCard sx={{ margin: 16, alignItems: 'center' }}>
-                    <Account session={session.session} />
-                </ThemeCard>
+        <ScrollView style={{ flex: 1, backgroundColor: '$background' }}>
 
-                {/* ---------- Theme Card ---------- */}
-                <ThemeCard sx={{ margin: 16 }}>
-                    <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>
-                        Color Mode
-                    </H1>
+            {/* ---------- Profile Card ---------- */}
+            <Account session={session.session} />
+
+            {/* ---------- Theme Card ---------- */}
+            <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>
+                Color Mode
+            </H1>
 
 
 
-                    {/* Segmented Control */}
-                    <View
-                        sx={{
-                            flexDirection: 'row',
-                            backgroundColor: '$mutedBackground',
-                            borderRadius: 12,
-                            padding: 4,
-                        }}
-                    >
-                        <ThemeButton
-                            title="standard"
-                            onPress={() => setMode('standard')}
-                            sx={{
-                                flex: 1,
-                                paddingY: 10,
-                                borderRadius: 10,
-                                alignItems: 'center',
-                                backgroundColor:
-                                    mode === 'standard' ? '$primary' : 'transparent',
-                                color: mode === 'standard' ? 'white' : 'black',
-                            }}
-                        >
-                            <Text sx={{ color: mode === 'standard' ? 'white' : '$text' }}>
-                                Standard
-                            </Text>
-                        </ThemeButton>
+            {/* Segmented Control */}
+            <View
+                sx={{
+                    flexDirection: 'row',
+                    backgroundColor: '$background',
+                    borderRadius: 12,
+                    padding: 4,
+                }}
+            >
+                <Button
+                    title="standard"
+                    onPress={() => setMode('standard')}
+                    sx={{
 
-                        <ThemeButton
-                            title="Pink"
-                            onPress={() => setMode('pink')}
-                            sx={{
-                                flex: 1,
-                                paddingY: 10,
-                                borderRadius: 10,
-                                alignItems: 'center',
-                                backgroundColor:
-                                    mode === 'pink' ? '$primary' : 'transparent',
-                            }}
-                        >
-                            <Text sx={{ color: mode === 'pink' ? 'white' : '$text' }}>
-                                Pink
-                            </Text>
-                        </ThemeButton>
-                    </View>
-                </ThemeCard>
-
-                {/* ---------- Logout Card ---------- */}
-                <ThemeCard sx={{ margin: 16 }}>
-                    <ThemeButton
-                        title="Logout"
-                        onPress={confirmLogout}
-                        sx={{
-                            backgroundColor: '#d9534f',
-                            paddingY: 14,
-                            borderRadius: 12,
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Text sx={{ color: 'white', fontWeight: 'bold' }}>
-                            Logout
-                        </Text>
-                    </ThemeButton>
-                </ThemeCard>
+                        backgroundColor:
+                            mode === 'standard' ? '$primary' : 'transparent',
+                        color: mode === 'standard' ? 'white' : 'black',
+                    }}
+                />
 
 
-                <StatusBar style="dark" />
-            </ScrollView>
-        </SafeAreaView>
+                <Button
+                    title="Pink"
+                    onPress={() => setMode('pink')}
+                    sx={{
+
+                        backgroundColor:
+                            mode === 'pink' ? '$primary' : 'transparent',
+                    }} />
+
+            </View>
+
+            {/* ---------- Logout Card ---------- */}
+            <Button
+                title="Logout"
+                onPress={confirmLogout}
+                color='accent'
+            />
+
+
+            <StatusBar style="auto" />
+        </ScrollView>
     )
 }
