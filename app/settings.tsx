@@ -58,23 +58,16 @@ export default function SettingsScreen() {
                 <Button
                     title="standard"
                     onPress={() => setMode('standard')}
-                    sx={{
+                    color={mode === 'standard' ? '$primary' : 'white'}
 
-                        backgroundColor:
-                            mode === 'standard' ? '$primary' : 'transparent',
-                        color: mode === 'standard' ? 'white' : 'black',
-                    }}
                 />
 
 
                 <Button
                     title="Pink"
                     onPress={() => setMode('pink')}
-                    sx={{
-
-                        backgroundColor:
-                            mode === 'pink' ? '$primary' : 'transparent',
-                    }} />
+                    color={mode === 'pink' ? '$primary' : 'white'}
+                />
 
             </View>
 
@@ -82,7 +75,7 @@ export default function SettingsScreen() {
             <Button
                 title="Logout"
                 onPress={confirmLogout}
-                color='accent'
+                color='$accent'
             />
 
 
