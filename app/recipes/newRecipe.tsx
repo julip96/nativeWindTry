@@ -343,7 +343,7 @@ export default function NewRecipe() {
                     setFocusedField(null);
                   }}
                 >
-                  <Picker.Item label="No specific cookbook" value={null} />
+                  <Picker.Item label="Select a cookbook" value={null} />
                   {books.map((b) => (
                     <Picker.Item key={b.id} label={b.name} value={b.id} />
                   ))}
