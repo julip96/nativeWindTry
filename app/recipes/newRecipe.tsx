@@ -9,6 +9,8 @@ import { supabase } from "../../utils/supabase";
 import Box from "@/components/Box";
 import UserInput from "@/components/UserInput";
 import Button from "@/components/Button";
+import PhotoPickerBox from '@/components/PhotoPickerBox';
+import * as ImagePicker from "expo-image-picker";
 
 export default function NewRecipe() {
   const { book_id } = useLocalSearchParams(); // optional vorgegebene Kochbuch-ID
@@ -154,7 +156,39 @@ export default function NewRecipe() {
     return true;
   };
 
+  async function handlePickImage() {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "We need access to your photos!");
+      return;
+    }
 
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setImage(result.assets[0].uri);
+    }
+  }
+
+  async function handleTakePhoto() {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "We need access to your camera!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setImage(result.assets[0].uri);
+    }
+  }
 
 
   const titleStyle = (field: string) => ({
@@ -331,7 +365,47 @@ export default function NewRecipe() {
                   validate={validateName}
                 />
               </Box>
+              <Text variant="heading">Image</Text>
+              {/* 📸 Bildpicker Buttons */}
+              <Box>
+                {!image && (
+                  <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: image ? "m" : "none" }}>
+                    <Pressable onPress={handlePickImage}>
+                      <View
+                        sx={{
+                          bg: "$secondary",
+                          p: "m",
+                          borderRadius: "m",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 150,
+                        }}
+                      >
+                        <Text sx={{ color: "white", fontWeight: "bold" }}>From Gallery</Text>
+                      </View>
+                    </Pressable>
 
+                    <Pressable onPress={handleTakePhoto}>
+                      <View
+                        sx={{
+                          bg: "$primary",
+                          p: "m",
+                          borderRadius: "m",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 150,
+                        }}
+                      >
+                        <Text sx={{ color: "white", fontWeight: "bold" }}>Take Photo</Text>
+                      </View>
+                    </Pressable>
+                  </View>
+                )}
+                {/* 🖼 Bildanzeige – IDENTISCH zu NewRecipe */}
+                {image && (
+                  <PhotoPickerBox onChange={setImage} uri={image} />
+                )}
+              </Box>
               {/* Cookbook */}
               <Text variant="heading">Cookbook</Text>
               <Box>
@@ -355,8 +429,6 @@ export default function NewRecipe() {
               {ingredients.map((item, index) => (
                 <Box
                   key={index}
-
-
                 >
                   <View sx={{ flexDirection: "row", alignItems: "center" }}>
                     <TextInput
@@ -422,9 +494,9 @@ export default function NewRecipe() {
 
 
 
-              {/* Instructions */}
               <Button title="+ Add Ingredient" onPress={handleAddIngredientRow} color="$primary" />
 
+              {/* Instructions */}
               <Text variant="heading">Instructions</Text>
               <Box flexDir="column">
                 <UserInput

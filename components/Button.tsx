@@ -31,7 +31,7 @@ const Button = ({
 
         >
             <Text sx={{
-                color: "$text",
+                color: "$textContrary",
                 fontWeight: "bold"
             }}>{title}</Text>
         </Pressable>

@@ -6,6 +6,7 @@ import React from 'react'
 import { Animated, Image, Keyboard, Pressable } from 'react-native'
 import { SearchHeader } from '../../components/SearchHeader'
 import { supabase } from '../../utils/supabase'
+import Button from '../../components/Button'
 
 
 export default function RecipesListScreen() {
@@ -163,24 +164,14 @@ export default function RecipesListScreen() {
                             />
                         ) : null}
 
-                        <Pressable
-                            android_ripple={{ color: '#ccc' }}
+
+
+                        <Button
+                            title="View"
                             onPress={() => router.push(`/recipes/${recipe.id}`)}
-                            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-                        >
-                            <View
-                                sx={{
-                                    bg: '$primary',
-                                    p: 'm',
-                                    borderRadius: 'm',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    mt: 's',
-                                }}
-                            >
-                                <Text sx={{ color: "$text", fontWeight: 'bold' }}>View</Text>
-                            </View>
-                        </Pressable>
+                            color='$primary'
+                        />
+
                     </Box>
 
 

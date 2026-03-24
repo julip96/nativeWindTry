@@ -262,6 +262,48 @@ export default function EditRecipeScreen() {
                             />
                         </Box>
 
+                        <Text variant="heading">Image</Text>
+                        {/* 📸 Bildpicker Buttons */}
+                        <Box>
+                            {!image && (
+                                <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: "m" }}>
+                                    <Pressable onPress={handlePickImage}>
+                                        <View
+                                            sx={{
+                                                bg: "$secondary",
+                                                p: "m",
+                                                borderRadius: "m",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                width: 150,
+                                            }}
+                                        >
+                                            <Text sx={{ color: "white", fontWeight: "bold" }}>From Gallery</Text>
+                                        </View>
+                                    </Pressable>
+
+                                    <Pressable onPress={handleTakePhoto}>
+                                        <View
+                                            sx={{
+                                                bg: "$primary",
+                                                p: "m",
+                                                borderRadius: "m",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                width: 150,
+                                            }}
+                                        >
+                                            <Text sx={{ color: "white", fontWeight: "bold" }}>Take Photo</Text>
+                                        </View>
+                                    </Pressable>
+                                </View>
+                            )}
+
+                            {/* 🖼 Bildanzeige – IDENTISCH zu NewRecipe */}
+                            {image && (
+                                <PhotoPickerBox onChange={setImage} uri={image} />
+                            )}
+                        </Box>
                         {/* Cookbook */}
                         <Text variant="heading">Cookbook</Text>
                         <Box>
@@ -283,43 +325,7 @@ export default function EditRecipeScreen() {
 
 
 
-                        {/* 📸 Bildpicker Buttons */}
-                        <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: "m" }}>
-                            <Pressable onPress={handlePickImage}>
-                                <View
-                                    sx={{
-                                        bg: "$secondary",
-                                        p: "m",
-                                        borderRadius: "m",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        width: 150,
-                                    }}
-                                >
-                                    <Text sx={{ color: "white", fontWeight: "bold" }}>From Gallery</Text>
-                                </View>
-                            </Pressable>
 
-                            <Pressable onPress={handleTakePhoto}>
-                                <View
-                                    sx={{
-                                        bg: "$primary",
-                                        p: "m",
-                                        borderRadius: "m",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        width: 150,
-                                    }}
-                                >
-                                    <Text sx={{ color: "white", fontWeight: "bold" }}>Take Photo</Text>
-                                </View>
-                            </Pressable>
-                        </View>
-
-                        {/* 🖼 Bildanzeige – IDENTISCH zu NewRecipe */}
-                        {image && (
-                            <PhotoPickerBox onChange={setImage} uri={image} />
-                        )}
 
                         {/* 🧂 Ingredients */}
                         <Text variant="heading">Ingredients</Text>

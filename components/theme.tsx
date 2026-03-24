@@ -6,6 +6,7 @@ import { Platform } from 'react-native'
 const standardColors = {
     $background: '#ffffff',
     $text: '#000000',
+    $textContrary: '#ffffff',
     $primary: '#dcd6f7',
     $secondary: '#a6b1e1',
     $accent: '#ED6A5A',
@@ -18,6 +19,7 @@ const standardColors = {
 const pinkColors = {
     $background: '#ffffff',
     $text: '#000000',
+    $textContrary: '#ffffff',
     $primary: '#ff4da6',
     $secondary: '#ff80bf',
     $accent: '#ffb3d9',
