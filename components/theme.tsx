@@ -7,12 +7,13 @@ const standardColors = {
     $background: '#ffffff',
     $text: '#000000',
     $textContrary: '#ffffff',
-    $primary: '#dcd6f7',
-    $secondary: '#a6b1e1',
+    $primary: '#a6b1e1',
+    $secondary: '#dcd6f7',
     $accent: '#ED6A5A',
     $muted: '#f2e9e4',
     $disabledBackground: '#e6e6e6',
     $disabledText: '#000000',
+    $placeholder: '#e0dcdc',
 }
 
 // --- PINK THEME ---
@@ -54,6 +55,11 @@ const baseTheme = {
             padding: 8,
             // fontFamily: fontName,
             // fontWeight: 'bold',
+        },
+        headingTwo: {
+            fontSize: 18,
+            color: '$accent',
+            padding: 8,
         },
         small: {
             fontSize: 14,

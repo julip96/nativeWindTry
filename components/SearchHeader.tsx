@@ -38,16 +38,15 @@ export function SearchHeader({
             sx={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                m: "s",
-                mt: "xs",
                 bg: "$background",
-                p: Platform.select({ ios: "m", android: "s" }),
+                mr: "s",
+
             }}
         >
             {/* TITLE */}
             <Text variant="heading">{title}</Text>
 
-            <View style={{ flex: 1 }} />
+            <View sx={{ flex: 1 }} />
 
             {/* ACTIONS */}
             <Animated.View
@@ -112,13 +111,16 @@ export function SearchHeader({
                         value={searchQuery}
                         onChangeText={onSearchChange}
                         placeholder={searchPlaceholder}
+                        placeholderTextColor='$placeholder'
                         sx={{
                             flex: 1,
                             borderWidth: 1,
                             borderColor: '$border',
                             borderRadius: 'm',
                             p: 's',
-                            bg: '$muted',
+                            bg: '$background',
+                            color: '$text',
+
                         }}
                     />
 

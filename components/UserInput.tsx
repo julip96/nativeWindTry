@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet } from 'react-native';
+import { View, TextInput, Text, StyleSheet, Platform } from 'react-native';
 
 interface UserInputProps {
   label?: string;
@@ -57,8 +57,8 @@ const UserInput: React.FC<UserInputProps> = ({
           </Text>
         )}
         <TextInput
-          placeholder={showLabel && !label ? placeholder : ''}
-          placeholderTextColor="#999"
+          placeholder={placeholder}
+          placeholderTextColor="#e0dcdc"
           value={value}
           onChangeText={text => {
             onChangeText(text);
@@ -87,6 +87,8 @@ const UserInput: React.FC<UserInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    margin: 8,
+    padding: Platform.select({ ios: 16, android: 8 }),
     marginVertical: 8,
     borderWidth: 2,
     borderRadius: 12,

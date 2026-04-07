@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Pressable, Text } from "dripsy";
+import { Platform } from "react-native/Libraries/Utilities/Platform";
 
 interface ButtonProps {
     title: string;
@@ -19,7 +20,7 @@ const Button = ({
             sx={{
                 bg: color,
                 p: "m",
-                m: "xs",
+                m: "s",
                 borderRadius: "m",
                 alignItems: "center",
                 boxShadow: "md",

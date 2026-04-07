@@ -7,6 +7,8 @@ import Avatar from "./Avatar";
 import { ThemeButton } from "./ThemeButton";
 import { ThemeCard } from "./ThemeCard";
 
+import Button from "./Button";
+
 type AccountProps = {
   session: Session | null;
 };
@@ -123,8 +125,9 @@ export default function Account({ session }: AccountProps) {
   // =========================
   if (!isEditing) {
     return (
-      <View sx={{ alignItems: "center" }}>
-        <Avatar
+      <View sx={{}}>
+        <Text variant="headingTwo">Account information</Text>
+        {/* <Avatar
           size={120}
           url={avatarUrl}
           onUpload={(path) => {
@@ -142,26 +145,14 @@ export default function Account({ session }: AccountProps) {
           }}
         >
           Username: {username || "Username"}
+        </Text> */}
+
+        <Text variant="body">
+          My Mail: {session?.user?.email}
         </Text>
 
-        <Text sx={{ fontSize: 14, color: "$secondaryText", marginTop: 2 }}>
-          Mail: {session?.user?.email}
-        </Text>
+        <Button title="Edit account" onPress={() => setIsEditing(true)} color='$primary' />
 
-        <Pressable
-          onPress={() => setIsEditing(true)}
-          sx={{
-            marginTop: 16,
-            paddingX: 16,
-            paddingY: 8,
-            backgroundColor: "$mutedBackground",
-            borderRadius: 12,
-            borderColor: "$border",
-            borderWidth: 1,
-          }}
-        >
-          <Text sx={{ color: "$text" }}>Edit</Text>
-        </Pressable>
       </View>
     );
   }

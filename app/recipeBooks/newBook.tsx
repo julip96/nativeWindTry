@@ -4,6 +4,9 @@ import { Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../utils/supabase';
 
+import Button from '@/components/Button';
+import UserInput from '@/components/UserInput';
+
 export default function NewRecipeBookScreen() {
     const router = useRouter();
     const [userId, setUserId] = useState<string | null>(null);
@@ -44,27 +47,30 @@ export default function NewRecipeBookScreen() {
 
     return (
         <ScrollView sx={{ flex: 1, bg: '$background', p: 'm' }}>
-            <Text variant="heading" sx={{ mb: 'm' }}>New Recipe Book</Text>
+            <Text variant="heading">New Recipe Book</Text>
 
-            <TextInput
-                placeholder="Book title"
+
+
+            <UserInput
+                label="Book Title"
                 value={name}
                 onChangeText={setName}
-                sx={{ bg: '$background', mb: 's' }}
+                placeholder="Enter book title"
             />
 
-            <TextInput
-                placeholder="Description (optional)"
+            <UserInput
+                label="Description (optional)"
                 value={description}
                 onChangeText={setDescription}
-                sx={{ bg: '$background', mb: 's' }}
+                placeholder="Enter book description"
             />
 
-            <Pressable android_ripple={{ color: '#ccc' }} onPress={handleSave} style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}>
-                <View sx={{ bg: '$primary', p: 'm', borderRadius: 'm', alignItems: 'center' }}>
-                    <Text sx={{ color: 'white', fontWeight: 'bold' }}>Save Book</Text>
-                </View>
-            </Pressable>
+            <Button
+                title="Save Book"
+                onPress={handleSave}
+                color='$primary'
+            />
+
         </ScrollView>
     );
 }

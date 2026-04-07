@@ -14,9 +14,9 @@ export default function Box({ children, flexDir, ...rest }: BoxProps) {
     return (
         <View sx={{
             m: "s",
+            p: Platform.select({ ios: "m", android: "s" }),
             mt: "xs",
             bg: "$background",
-            p: Platform.select({ ios: "m", android: "s" }),
             borderRadius: Platform.select({ ios: "m", android: "m" }),
             borderWidth: 2,
             boxShadow: "md",

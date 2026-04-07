@@ -1,5 +1,5 @@
 import { useSession } from '@/components/SessionProvider'
-import { H1, ScrollView, View } from 'dripsy'
+import { H1, ScrollView, View, Text } from 'dripsy'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
 import { useThemeMode } from '../components/ThemeProvider'
@@ -34,15 +34,13 @@ export default function SettingsScreen() {
 
     return (
 
-        <ScrollView style={{ flex: 1, backgroundColor: '$background' }}>
+        <ScrollView sx={{ flex: 1, backgroundColor: '$background', p: 's' }}>
+            <Text variant="heading">Settings</Text>
 
-            {/* ---------- Profile Card ---------- */}
             <Account session={session.session} />
 
-            {/* ---------- Theme Card ---------- */}
-            <H1 sx={{ fontSize: 22, marginBottom: 16, color: '$text' }}>
-                Color Mode
-            </H1>
+
+            <Text variant="headingTwo">Colour mode</Text>
 
 
 
@@ -58,15 +56,14 @@ export default function SettingsScreen() {
                 <Button
                     title="standard"
                     onPress={() => setMode('standard')}
-                    color={mode === 'standard' ? '$primary' : 'white'}
-
+                    color={mode === 'standard' ? '$primary' : '$secondary'}
                 />
 
 
                 <Button
                     title="Pink"
                     onPress={() => setMode('pink')}
-                    color={mode === 'pink' ? '$primary' : 'white'}
+                    color={mode === 'pink' ? '$primary' : '$secondary'}
                 />
 
             </View>

@@ -217,39 +217,39 @@ export default function NewRecipe() {
             <View>
 
               <Text variant="heading">Recipe Title</Text>
-              <Box>
-                <UserInput
-                  label="Title"
-                  placeholder="e.g. Creamy Mushroom Pasta"
-                  value={title}
-                  onChangeText={setTitle}
-                  validate={validateName}
-                />
-              </Box>
+
+              <UserInput
+                label="Title"
+                placeholder="e.g. Creamy Mushroom Pasta"
+                value={title}
+                onChangeText={setTitle}
+                validate={validateName}
+              />
+
               {/* Cookbook */}
               <Text variant="heading">Cookbook</Text>
-              <Box>
-                <Picker
-                  // changed from {selectedBookId}
-                  selectedValue={selectedBookId ? selectedBookId : null}
-                  onFocus={() => handleFocus("book")}
-                  onValueChange={(val) => {
-                    setSelectedBookId(val);
-                    setFocusedField(null);
-                  }}
-                  style={{
-                    height: 200,
-                    width: 300
 
-                  }}
-                  itemStyle={{ color: "black" }}
-                >
-                  <Picker.Item label="No specific cookbook" value={null} style={{ height: 200 }} />
-                  {books.map((b) => (
-                    <Picker.Item key={b.id} label={b.name} value={b.id} />
-                  ))}
-                </Picker>
-              </Box>
+              <Picker
+                // changed from {selectedBookId}
+                selectedValue={selectedBookId ? selectedBookId : null}
+                onFocus={() => handleFocus("book")}
+                onValueChange={(val) => {
+                  setSelectedBookId(val);
+                  setFocusedField(null);
+                }}
+                style={{
+                  height: 200,
+                  width: 300
+
+                }}
+                itemStyle={{ color: "black" }}
+              >
+                <Picker.Item label="No specific cookbook" value={null} style={{ height: 200 }} />
+                {books.map((b) => (
+                  <Picker.Item key={b.id} label={b.name} value={b.id} />
+                ))}
+              </Picker>
+
 
               {/* 🧂 Zutaten */}
               <Text variant="heading">Ingredients</Text>
@@ -311,20 +311,20 @@ export default function NewRecipe() {
               <Button title="+ Add Ingredient" onPress={handleAddIngredientRow} color="$primary" />
 
               <Text variant="heading">Instructions</Text>
-              <Box flexDir="column">
-                <UserInput
-                  label="Instructions"
-                  placeholder="Step-by-step Instructions"
-                  value={instructions}
-                  onChangeText={setInstructions}
-                  validate={validateInstructions}
-                  multiline
-                  onFocus={() => {
-                    scrollViewRef.current?.scrollToEnd({ animated: true });
-                  }}
-                />
 
-              </Box>
+              <UserInput
+                label="Instructions"
+                placeholder="Step-by-step Instructions"
+                value={instructions}
+                onChangeText={setInstructions}
+                validate={validateInstructions}
+                multiline
+                onFocus={() => {
+                  scrollViewRef.current?.scrollToEnd({ animated: true });
+                }}
+              />
+
+
 
               {/* Save */}
 

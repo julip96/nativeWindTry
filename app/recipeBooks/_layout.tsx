@@ -5,20 +5,21 @@ export default function RecipeBooksLayout() {
     return (
         <Stack
             screenOptions={{
-                headerShown: true,
-                headerTitleAlign: 'center',
+                headerShown: false,
             }}
         >
             <Stack.Screen
                 name="index"
                 options={{
                     title: 'Recipe Books',
+                    presentation: 'card'
                 }}
             />
             <Stack.Screen
                 name="newBook"
                 options={{
                     title: 'New Recipe Book',
+                    // presentation: 'modal',
                 }}
             />
         </Stack>

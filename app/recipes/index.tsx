@@ -86,7 +86,7 @@ export default function RecipesListScreen() {
 
     return (
         <ScrollView
-            sx={{ flex: 1, bg: '$background' }}
+            sx={{ flex: 1, backgroundColor: '$background', p: 's' }}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             onScrollBeginDrag={() => {
@@ -127,7 +127,7 @@ export default function RecipesListScreen() {
                                 justifyContent: 'center',
                             }}
                         >
-                            <Text style={{ color: "$text", fontWeight: 'bold' }}>
+                            <Text sx={{ color: "$textContrary", fontWeight: 'bold' }}>
                                 + New
                             </Text>
                         </View>
