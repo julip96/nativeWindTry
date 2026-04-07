@@ -10,6 +10,7 @@ interface UserInputProps {
   placeholder?: string;
   multiline?: boolean;
   onFocus?: () => void;
+  secureTextEntry?: boolean;
 }
 
 const UserInput: React.FC<UserInputProps> = ({
@@ -21,6 +22,8 @@ const UserInput: React.FC<UserInputProps> = ({
   placeholder = '',
   multiline = false,
   onFocus,
+  secureTextEntry,
+
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +70,7 @@ const UserInput: React.FC<UserInputProps> = ({
             setIsFocused(true)
             if (onFocus) onFocus();
           }}
-
+          secureTextEntry={secureTextEntry}
           onBlur={handleBlur}
           style={[styles.input, multiline && styles.multilineInput]}
           multiline={multiline}
