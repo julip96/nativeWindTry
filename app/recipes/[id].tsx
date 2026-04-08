@@ -6,6 +6,7 @@ import { Alert, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '@/utils/supabase';
 import { Image } from 'react-native';
+import Button from '@/components/Button'
 
 export default function RecipeDetailsScreen() {
 
@@ -84,9 +85,9 @@ export default function RecipeDetailsScreen() {
 
     return (
 
-        <ScrollView>
+        <ScrollView sx={{ flex: 1, bg: '$background', p: 'm' }}>
 
-            <View sx={{ flex: 1, bg: '$background', p: 'm' }}>
+            <View >
 
                 <Text variant="heading" sx={{ mb: 'm' }}>
 
@@ -102,12 +103,12 @@ export default function RecipeDetailsScreen() {
                             height: 200,
                             borderRadius: 12,
                             marginBottom: 16,
+                            paddingLeft: 8,
+                            paddingRight: 8,
                         }}
                         resizeMode="cover"
                     />
                 ) : null}
-
-
 
                 <Text variant="heading" sx={{ mb: 'm' }}>
 
@@ -157,50 +158,23 @@ export default function RecipeDetailsScreen() {
 
                 <Text variant="body">{recipe.instructions}</Text>
 
+
+                {/* Delete Recipe */}
+                <Button
+                    title="Delete"
+                    onPress={deleteRecipe}
+                    color='$primary'
+                />
+
+                <Button
+                    title="Edit"
+                    onPress={() => router.replace(`./editRecipe?id=${id}`)}
+                    color='$secondary'
+                />
+
+                <StatusBar style="auto" />
+
             </View>
-
-            {/* Delete Recipe */}
-            <Pressable
-
-                onPress={deleteRecipe}
-
-                style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}>
-
-                <View sx={{
-
-                    bg: '$primary',
-                    p: 'm',
-                    borderRadius: 'm',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mt: 's',
-
-                }}>
-                    <Text sx={{ color: 'white', fontWeight: 'bold' }}>Delete</Text>
-
-                </View>
-
-            </Pressable>
-
-            <Pressable
-                onPress={() => router.replace(`./editRecipe?id=${id}`)}
-                style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}>
-                <View
-                    sx={{
-                        bg: '$secondary',
-                        p: 'm',
-                        borderRadius: 'm',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mt: 's',
-                    }}>
-                    <Text sx={{ color: 'white', fontWeight: 'bold' }}>Edit</Text>
-                </View>
-            </Pressable>
-
-
-            <StatusBar style="dark" />
-
 
         </ScrollView>
     )

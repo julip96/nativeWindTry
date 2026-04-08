@@ -159,6 +159,8 @@ export default function RecipesListScreen() {
                                     borderRadius: 10,
                                     marginBottom: 8,
                                     marginTop: 4,
+                                    paddingLeft: 8,
+                                    paddingRight: 8,
                                 }}
                                 resizeMode="cover"
                             />

@@ -1,62 +1,49 @@
-import { Text, View, H1, H2, P, A, Container } from "dripsy";
+import { Text, View, P, ScrollView } from "dripsy";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   return (
 
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fffaf0' }}>
 
-      <View sx={{
-
-        backgroundColor: '$background',
-        padding: 20,
-        margin: 5,
-        flex: 1,
-        marginTop: 50,
-        marginBottom: 250,
-        borderRadius: 5
-
-      }}>
+    <ScrollView
+      sx={{ flex: 1, backgroundColor: '$background', p: 's' }}
+    >
 
 
-        <H1 sx={{
+      <Text variant="heading">
+        Welcome!
+      </Text>
 
-          color: '$text', fontSize: 20, marginTop: 20,
-          textShadow: 'onImage'
+      <Text variant="body">
 
-        }}>
-
-          Welcome!
-
-        </H1>
-
-        <P sx={{ color: '$text', fontSize: 20, marginTop: 20 }}>
-
-
+        <P>
           This is the welcome screen for the prototype of my app.
-
         </P>
 
-        <A sx={{ color: '$text', fontSize: 20, marginTop: 20 }} href="https://dripsy.xyz">
+      </Text>
 
+      <Text variant="body">
+
+        <P>
           In the final version, this will be gone.
+        </P>
 
-        </A>
+      </Text>
+
+      <Text variant="body">
+
+        <P>
+          Fee
+          l free to explore the app using the tab navigation below!
+        </P>
+      </Text>
 
 
+      <StatusBar style="dark" />
 
-        <Text sx={{ color: '$text', fontSize: 20, marginTop: 20 }}>
+    </ScrollView>
 
-          Feel free to explore the app!
-
-        </Text>
-
-        <StatusBar style="dark" />
-
-      </View>
-
-    </SafeAreaView>
 
   );
 }

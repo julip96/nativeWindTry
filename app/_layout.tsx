@@ -6,7 +6,7 @@ import { Href, Slot, useRouter, useSegments } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { Keyboard, Platform, useColorScheme } from 'react-native'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-import Auth from '../components/Auth'
+import Auth from '@/components/Auth'
 import { SessionProvider } from '../components/SessionProvider'
 import { ThemeProvider } from '../components/ThemeProvider'
 import { supabase } from '../utils/supabase'
@@ -52,7 +52,6 @@ export default function RootLayout() {
     { name: 'recipeBooks', label: 'Books', path: '/recipeBooks' },
     { name: 'recipes', label: 'Recipes', path: '/recipes' },
     { name: 'settings', label: 'Settings', path: '/settings' },
-    { name: 'testStyle', label: 'TestScreen', path: '/test' }
   ]
 
   // If no session, show Auth screen instead of tabs

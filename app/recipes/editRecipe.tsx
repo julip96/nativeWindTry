@@ -309,6 +309,7 @@ export default function EditRecipeScreen() {
                         <Box>
                             <Picker
                                 // changed from {selectedBookId}
+                                itemStyle={{ color: "black" }}
                                 selectedValue={selectedBookId ? selectedBookId : null}
                                 onFocus={() => handleFocus("book")}
                                 onValueChange={(val) => {
@@ -330,76 +331,59 @@ export default function EditRecipeScreen() {
                         {/* 🧂 Ingredients */}
                         <Text variant="heading">Ingredients</Text>
 
+
+
                         {ingredients.map((item, index) => (
-                            <Box
-                                key={index}
-                            >
-                                <View sx={{ flexDirection: "row", alignItems: "center" }}>
-                                    <TextInput
-                                        sx={{
-                                            width: 70,
-                                            mr: "s",
-                                            textAlign: "center",
-                                            height: "90%",
-                                        }}
-                                        placeholder="Amt"
-                                        value={item.amount}
-                                        keyboardType="numeric"
-                                        onFocus={() => handleFocus(`amt-${index}`)}
-                                        onChangeText={(text) =>
-                                            handleIngredientChange(index, "amount", text)
-                                        }
-                                    />
+                            <Box key={index} flexDir="column">
 
-                                    <View
-                                        sx={{
-                                            width: 120,
-                                            height: "90%",
-                                            mr: "s",
-                                            p: 1,
-                                        }}
-                                    >
-                                        <Picker
-                                            selectedValue={item.unit}
-                                            onFocus={() => handleFocus(`unit-${index}`)}
-                                            onValueChange={(val) => {
-                                                handleIngredientChange(index, "unit", val);
-                                                setFocusedField(null);
-                                            }}
-                                        >
-                                            {units.map((u) => (
-                                                <Picker.Item key={u} label={u} value={u} />
-                                            ))}
-                                        </Picker>
-                                    </View>
+                                <UserInput
+                                    label="Name"
+                                    placeholder="Type in ingredient name here"
+                                    value={item.name}
+                                    onChangeText={(text) =>
+                                        handleIngredientChange(index, "name", text)
+                                    }
+                                    validate={validateName}
+                                />
 
-                                    <TextInput
-                                        sx={{
-                                            flex: 1,
-                                            height: "90%",
-                                        }}
-                                        placeholder="Ingredient Name"
-                                        value={item.name}
-                                        onFocus={() => handleFocus(`name-${index}`)}
-                                        onChangeText={(text) =>
-                                            handleIngredientChange(index, "name", text)
-                                        }
-                                    />
+                                <UserInput
+                                    label="Amount"
+                                    placeholder="Type in amount here"
+                                    value={item.amount}
+                                    onChangeText={(text) =>
+                                        handleIngredientChange(index, "amount", text)
+                                    }
+                                    validate={validateAmount}
+                                />
 
-                                    <Pressable
-                                        onPress={() => handleRemoveIngredient(index)}
-                                        sx={{ m: "s" }}
-                                    >
-                                        <Ionicons name="trash" size={22} color="red" />
-                                    </Pressable>
-                                </View>
+
+                                <Picker
+                                    selectedValue={item.unit}
+                                    onFocus={() => handleFocus(`unit-${index}`)}
+                                    onValueChange={(val) => {
+                                        handleIngredientChange(index, "unit", val);
+                                        setFocusedField(null);
+                                    }}
+                                    itemStyle={{ color: "black" }}
+                                >
+                                    {units.map((u) => (
+                                        <Picker.Item key={u} label={u} value={u} />
+                                    ))}
+                                </Picker>
+
+
+
+                                <Pressable
+                                    onPress={() => handleRemoveIngredient(index)}
+                                    sx={{ m: "s", alignSelf: "flex-end" }}
+
+                                >
+                                    <Ionicons name="trash" size={22} color="red" />
+                                </Pressable>
+
                             </Box>
                         ))}
 
-
-
-
-                        {/* ➕ Add Ingredient */}
                         <Button title="+ Add Ingredient" onPress={handleAddIngredient} color="$primary" />
 
                         {/* ✍️ Instructions */}
