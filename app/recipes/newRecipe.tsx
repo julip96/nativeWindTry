@@ -1,9 +1,10 @@
+import type { ScrollView as ScrollViewType } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { Pressable, ScrollView, Text, TextInput, View } from "dripsy";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Alert, Keyboard, Platform, TouchableWithoutFeedback } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native";
 import { supabase } from "../../utils/supabase";
 import Box from "@/components/Box";
 import UserInput from "@/components/UserInput";
@@ -196,6 +197,8 @@ export default function NewRecipe() {
     color: "$text",
     fontSize: 16,
   });
+  const scrollViewRef = useRef<ScrollViewType | null>(null);
+
 
   if (Platform.OS === "ios") {
     return (
@@ -249,419 +252,66 @@ export default function NewRecipe() {
 
 
               {/* 🧂 Zutaten */}
-              <View sx={{
-                ...inputStyle("ingredients"),
-                mb: "s",
-                bg: "$background",
-                p: "s",
-                borderRadius: "m",
-                borderColor: "$primary",
-                borderWidth: 1,
-                boxShadow: "md",
-              }}>
-                <Text sx={{ ...titleStyle("ingredients") }}>Ingredients</Text>
+              <Text variant="heading">Ingredients</Text>
 
-                {/* has shadow */}
-                {ingredients.map((item, index) => (
-                  <View
-                    key={index}
-                    sx={{
-                      mb: "s",
-                      bg: "$background",
-                      p: "s",
-                      borderRadius: "m",
-                      borderColor: "$primary",
-                      borderWidth: 1,
-                      boxShadow: "md",
-                    }}
-                  >
-                    <View sx={{ flexDirection: "row", alignItems: "center" }}>
-                      <TextInput
-                        sx={{
-                          ...inputStyle(`amt-${index}`),
-                          width: 70,
-                          mr: "s",
-                          textAlign: "center",
-                          height: "90%",
-                        }}
-                        placeholder="Amt"
-                        value={item.amount}
-                        keyboardType="numeric"
-                        onFocus={() => handleFocus(`amt-${index}`)}
-                        onChangeText={(text) =>
-                          handleIngredientChange(index, "amount", text)
-                        }
-                      />
-
-                      <View
-                        sx={{
-                          ...inputStyle(`unit-${index}`),
-                          width: 120,
-                          height: "90%",
-                          mr: "s",
-                          p: 1,
-                        }}
-                      >
-                        <Picker
-                          selectedValue={item.unit}
-                          onFocus={() => handleFocus(`unit-${index}`)}
-                          onValueChange={(val) => {
-                            handleIngredientChange(index, "unit", val);
-                            setFocusedField(null);
-                          }}
-                          itemStyle={{ color: "black" }}
-                        >
-                          {units.map((u) => (
-                            <Picker.Item key={u} label={u} value={u} />
-                          ))}
-                        </Picker>
-                      </View>
-
-                      <TextInput
-                        sx={{
-                          ...inputStyle(`name-${index}`),
-                          flex: 1,
-                          height: "90%",
-                        }}
-                        placeholder="Ingredient Name"
-                        value={item.name}
-                        onFocus={() => handleFocus(`name-${index}`)}
-                        onChangeText={(text) =>
-                          handleIngredientChange(index, "name", text)
-                        }
-                      />
-
-                      <Pressable
-                        onPress={() => handleRemoveIngredient(index)}
-                        sx={{ m: "s" }}
-                      >
-                        <Ionicons name="trash" size={22} color="red" />
-                      </Pressable>
-                    </View>
-                  </View>
-                ))}
-
-                <Pressable onPress={handleAddIngredientRow}>
-                  <View
-                    sx={{
-                      bg: "$primary",
-                      p: "m",
-                      m: "xs",
-                      borderRadius: "m",
-                      alignItems: "center",
-                      // shadowColor: "#000",
-                      // shadowOffset: { width: 0, height: 2 },
-                      // shadowOpacity: 0.3,
-                      // shadowRadius: 10,
-                      // elevation: 3,
-                      boxShadow: "md",
-                    }}
-                  >
-                    <Text sx={{ color: "$text", fontWeight: "bold" }}>
-                      + Add Ingredient
-                    </Text>
-                  </View>
-                </Pressable>
-              </View>
-              {/* 🧂 Zutaten Style testen!*/}
-              <View sx={{
-                ...inputStyle("ingredients"),
-                mb: "s",
-                bg: "$background",
-                p: "s",
-                borderRadius: "m",
-                borderWidth: 1,
-                boxShadow: "md",
-                flexDirection: "column"
-              }}>
-                <Text sx={{ ...titleStyle("ingredients") }}>Ingredients test style</Text>
-
-                {/* has shadow */}
-                {ingredients.map((item, index) => (
-                  <View
-                    key={index}
-                    sx={{
-                      mb: "s",
-                      bg: "$background",
-                      p: "s",
-                      borderRadius: "m",
-                      borderColor: "$primary",
-                      borderWidth: 1,
-                      boxShadow: "md",
-                    }}
-                  >
-                    <TextInput
-                      sx={{
-                        ...inputStyle(`name-${index}`),
-                        flex: 1,
-                        height: "1%",
-                        width: "100%"
-                      }}
-                      placeholder="Ingredient Name"
-                      value={item.name}
-                      onFocus={() => handleFocus(`name-${index}`)}
-                      onChangeText={(text) =>
-                        handleIngredientChange(index, "name", text)
-                      }
-                    />
-                    <View sx={{ flexDirection: "column", alignItems: "center" }}>
-                      <TextInput
-                        sx={{
-                          ...inputStyle(`amt-${index}`),
-                          width: "100%",
-                          textAlign: "left",
-                          height: "1%",
-                        }}
-                        placeholder="Amt"
-                        value={item.amount}
-                        keyboardType="numeric"
-                        onFocus={() => handleFocus(`amt-${index}`)}
-                        onChangeText={(text) =>
-                          handleIngredientChange(index, "amount", text)
-                        }
-                      />
-
-                      <View
-                        sx={{
-                          ...inputStyle(`unit-${index}`),
-                          width: "100%",
-                          height: "50%",
-                        }}
-                      >
-                        <Picker
-                          selectedValue={item.unit}
-                          onFocus={() => handleFocus(`unit-${index}`)}
-                          onValueChange={(val) => {
-                            handleIngredientChange(index, "unit", val);
-                            setFocusedField(null);
-                          }}
-                        >
-                          {units.map((u) => (
-                            <Picker.Item key={u} label={u} value={u} />
-                          ))}
-                        </Picker>
-                      </View>
+              {/* has shadow */}
+              {ingredients.map((item, index) => (
+                <Box key={index} flexDir="column">
 
 
 
-                      <Pressable
-                        onPress={() => handleRemoveIngredient(index)}
-                        sx={{ m: "s" }}
-                      >
-                        <Ionicons name="trash" size={22} color="red" />
-                      </Pressable>
-                    </View>
-                  </View>
-                ))}
-
-                <Button title="+ Add Ingredient" onPress={handleAddIngredientRow} color="$primary" />
-
-                <Text variant="heading">Instructions</Text>
-
-                <UserInput
-                  label="Instructions"
-                  placeholder="Step-by-step Instructions"
-                  value={instructions}
-                  onChangeText={setInstructions}
-                  validate={validateInstructions}
-                  multiline
-                  onFocus={() => {
-                    scrollViewRef.current?.scrollToEnd({ animated: true });
-                  }}
-                />
-
-
-
-                {/* Save */}
-
-                <Button title="Save Recipe" onPress={handleSaveRecipe} color="$accent" />
-
-              </View>
-          </TouchableWithoutFeedback>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    );
-
-  } else {
-    return (
-      <ScrollView sx={{ p: "m", bg: "$background", flex: 1 }}>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            Keyboard.dismiss();
-            setFocusedField(null);
-          }}
-        >
-          <View>
-            <Text variant="heading" sx={{ mb: "m" }}>
-              New Recipe
-            </Text>
-
-            <Text variant="heading">Recipe Title</Text>
-            <Box>
-              <UserInput
-                label="Title"
-                placeholder="e.g. Creamy Mushroom Pasta"
-                value={title}
-                onChangeText={setTitle}
-                validate={validateName}
-              />
-            </Box>
-            <Text variant="heading">Image</Text>
-            {/* 📸 Bildpicker Buttons */}
-            <Box>
-              {!image && (
-                <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: image ? "m" : "none" }}>
-                  <Pressable onPress={handlePickImage}>
-                    <View
-                      sx={{
-                        bg: "$secondary",
-                        p: "m",
-                        borderRadius: "m",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: 150,
-                      }}
-                    >
-                      <Text sx={{ color: "white", fontWeight: "bold" }}>From Gallery</Text>
-                    </View>
-                  </Pressable>
-
-                  <Pressable onPress={handleTakePhoto}>
-                    <View
-                      sx={{
-                        bg: "$primary",
-                        p: "m",
-                        borderRadius: "m",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: 150,
-                      }}
-                    >
-                      <Text sx={{ color: "white", fontWeight: "bold" }}>Take Photo</Text>
-                    </View>
-                  </Pressable>
-                </View>
-              )}
-              {/* 🖼 Bildanzeige – IDENTISCH zu NewRecipe */}
-              {image && (
-                <PhotoPickerBox onChange={setImage} uri={image} />
-              )}
-            </Box>
-            {/* Cookbook */}
-            <Text variant="heading">Cookbook</Text>
-            <Box>
-              <Picker
-                selectedValue={selectedBookId}
-                onFocus={() => handleFocus("book")}
-                onValueChange={(val) => {
-                  setSelectedBookId(val);
-                  setFocusedField(null);
-                }}
-              >
-                <Picker.Item label="Select a cookbook" value={null} />
-                {books.map((b) => (
-                  <Picker.Item key={b.id} label={b.name} value={b.id} />
-                ))}
-              </Picker>
-            </Box>
-
-            {/* 🧂 Zutaten */}
-            <Text variant='heading'>Ingredients</Text>
-            {ingredients.map((item, index) => (
-              <Box
-                key={index}
-              >
-                <View sx={{ flexDirection: "row", alignItems: "center" }}>
-                  <TextInput
-                    sx={{
-                      width: 70,
-                      mr: "s",
-                      textAlign: "center",
-                      height: "90%",
-                    }}
-                    placeholder="Amt"
-                    value={item.amount}
-                    keyboardType="numeric"
-                    onFocus={() => handleFocus(`amt-${index}`)}
-                    onChangeText={(text) =>
-                      handleIngredientChange(index, "amount", text)
-                    }
-                  />
-
-                  <View
-                    sx={{
-                      ...inputStyle(`unit-${index}`),
-                      width: 120,
-                      height: "90%",
-                      mr: "s",
-                      p: 1,
-                    }}
-                  >
-                    <Picker
-                      selectedValue={item.unit}
-                      onFocus={() => handleFocus(`unit-${index}`)}
-                      onValueChange={(val) => {
-                        handleIngredientChange(index, "unit", val);
-                        setFocusedField(null);
-                      }}
-                    >
-                      {units.map((u) => (
-                        <Picker.Item key={u} label={u} value={u} />
-                      ))}
-                    </Picker>
-                  </View>
-
-                  <TextInput
-                    sx={{
-                      ...inputStyle(`name-${index}`),
-                      flex: 1,
-                      height: "90%",
-                    }}
-                    placeholder="Ingredient Name"
+                  <UserInput
+                    label="Name"
+                    placeholder="Type in ingredient name here"
                     value={item.name}
-                    onFocus={() => handleFocus(`name-${index}`)}
                     onChangeText={(text) =>
                       handleIngredientChange(index, "name", text)
                     }
+                    validate={validateName}
                   />
+
+                  <UserInput
+                    label="Amount"
+                    placeholder="Type in amount here"
+                    value={item.amount}
+                    onChangeText={(text) =>
+                      handleIngredientChange(index, "amount", text)
+                    }
+                    validate={validateAmount}
+                  />
+
+
+                  <Picker
+                    selectedValue={item.unit}
+                    onFocus={() => handleFocus(`unit-${index}`)}
+                    onValueChange={(val) => {
+                      handleIngredientChange(index, "unit", val);
+                      setFocusedField(null);
+                    }}
+                    itemStyle={{ color: "black" }}
+                  >
+                    {units.map((u) => (
+                      <Picker.Item key={u} label={u} value={u} />
+                    ))}
+                  </Picker>
+
+
 
                   <Pressable
                     onPress={() => handleRemoveIngredient(index)}
-                    sx={{ m: "s" }}
+                    sx={{ m: "s", alignSelf: "flex-end" }}
+
                   >
                     <Ionicons name="trash" size={22} color="red" />
                   </Pressable>
-                </View>
-              </View>
-            ))}
 
-            <Pressable onPress={handleAddIngredientRow}>
-              <View
-                sx={{
-                  bg: "$primary",
-                  p: "m",
-                  m: "xs",
-                  borderRadius: "m",
-                  alignItems: "center",
-                  // shadowColor: "#000",
-                  // shadowOffset: { width: 0, height: 2 },
-                  // shadowOpacity: 0.3,
-                  // shadowRadius: 10,
-                  // elevation: 3,
-                  boxShadow: "md",
-                }}
-              >
-                <Text sx={{ color: "$text", fontWeight: "bold" }}>
-                  + Add Ingredient
-                </Text>
-              </View>
-            </Pressable>
+                </Box>
+              ))}
 
-            <Button title="+ Add Ingredient" onPress={handleAddIngredientRow} color="$primary" />
+              <Button title="+ Add Ingredient" onPress={handleAddIngredientRow} color="$primary" />
 
-            {/* Instructions */}
-            <Text variant="heading">Instructions</Text>
-            <Box flexDir="column">
+              <Text variant="heading">Instructions</Text>
+
               <UserInput
                 label="Instructions"
                 placeholder="Step-by-step Instructions"
@@ -674,28 +324,203 @@ export default function NewRecipe() {
                 }}
               />
 
+
+
               {/* Save */}
-              <Pressable onPress={handleSaveRecipe}>
-                <View
-                  sx={{
-                    bg: "$primary",
-                    p: "m",
-                    borderRadius: "m",
-                    alignItems: "center",
-                    // shadowColor: "#000",
-                    // shadowOffset: { width: 0, height: 2 },
-                    // shadowOpacity: 0.3,
-                    // shadowRadius: 10,
-                    // elevation: 3,
-                    boxShadow: "md",
+
+              <Button title="Save Recipe" onPress={handleSaveRecipe} color="$accent" />
+
+            </View>
+          </TouchableWithoutFeedback>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+
+  } else {
+    return (
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="height"
+        keyboardVerticalOffset={0} // je nach Header-Höhe anpassen
+      >
+        <ScrollView sx={{ p: "m", bg: "$background", flex: 1, }} keyboardShouldPersistTaps="handled">
+          <TouchableWithoutFeedback
+            onPress={() => {
+              Keyboard.dismiss();
+              setFocusedField(null);
+            }}
+          >
+            <View>
+              <Text variant="heading" sx={{ mb: "m" }}>
+                New Recipe
+              </Text>
+
+              <Text variant="heading">Recipe Title</Text>
+              <Box>
+                <UserInput
+                  label="Title"
+                  placeholder="e.g. Creamy Mushroom Pasta"
+                  value={title}
+                  onChangeText={setTitle}
+                  validate={validateName}
+                />
+              </Box>
+              <Text variant="heading">Image</Text>
+              {/* 📸 Bildpicker Buttons */}
+              <Box>
+                {!image && (
+                  <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: image ? "m" : "none" }}>
+                    <Pressable onPress={handlePickImage}>
+                      <View
+                        sx={{
+                          bg: "$secondary",
+                          p: "m",
+                          borderRadius: "m",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 150,
+                        }}
+                      >
+                        <Text sx={{ color: "white", fontWeight: "bold" }}>From Gallery</Text>
+                      </View>
+                    </Pressable>
+
+                    <Pressable onPress={handleTakePhoto}>
+                      <View
+                        sx={{
+                          bg: "$primary",
+                          p: "m",
+                          borderRadius: "m",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 150,
+                        }}
+                      >
+                        <Text sx={{ color: "white", fontWeight: "bold" }}>Take Photo</Text>
+                      </View>
+                    </Pressable>
+                  </View>
+                )}
+                {/* 🖼 Bildanzeige – IDENTISCH zu NewRecipe */}
+                {image && (
+                  <PhotoPickerBox onChange={setImage} uri={image} />
+                )}
+              </Box>
+              {/* Cookbook */}
+              <Text variant="heading">Cookbook</Text>
+              <Box>
+                <Picker
+                  selectedValue={selectedBookId}
+                  onFocus={() => handleFocus("book")}
+                  onValueChange={(val) => {
+                    setSelectedBookId(val);
+                    setFocusedField(null);
                   }}
                 >
-                  <Text sx={{ color: "$text", fontWeight: "bold" }}>Save</Text>
-                </View>
-              </Pressable>
-          </View>
-        </TouchableWithoutFeedback>
-      </ScrollView>
+                  <Picker.Item label="Select a cookbook" value={null} />
+                  {books.map((b) => (
+                    <Picker.Item key={b.id} label={b.name} value={b.id} />
+                  ))}
+                </Picker>
+              </Box>
+
+              {/* 🧂 Zutaten */}
+              <Text variant='heading'>Ingredients</Text>
+              {ingredients.map((item, index) => (
+                <Box
+                  key={index}
+                >
+                  <View sx={{ flexDirection: "row", alignItems: "center" }}>
+                    <TextInput
+                      sx={{
+                        width: 70,
+                        mr: "s",
+                        textAlign: "center",
+                        height: "90%",
+                      }}
+                      placeholder="Amt"
+                      value={item.amount}
+                      keyboardType="numeric"
+                      onFocus={() => handleFocus(`amt-${index}`)}
+                      onChangeText={(text) =>
+                        handleIngredientChange(index, "amount", text)
+                      }
+                    />
+
+                    <View
+                      sx={{
+                        width: 120,
+                        height: "90%",
+                        mr: "s",
+                        p: 1,
+                      }}
+                    >
+                      <Picker
+                        selectedValue={item.unit}
+                        onFocus={() => handleFocus(`unit-${index}`)}
+                        onValueChange={(val) => {
+                          handleIngredientChange(index, "unit", val);
+                          setFocusedField(null);
+                        }}
+                      >
+                        {units.map((u) => (
+                          <Picker.Item key={u} label={u} value={u} />
+                        ))}
+                      </Picker>
+                    </View>
+
+                    <TextInput
+                      sx={{
+                        flex: 1,
+                        height: "90%",
+                      }}
+                      placeholder="Ingredient Name"
+                      value={item.name}
+                      onFocus={() => handleFocus(`name-${index}`)}
+                      onChangeText={(text) =>
+                        handleIngredientChange(index, "name", text)
+                      }
+                    />
+
+                    <Pressable
+                      onPress={() => handleRemoveIngredient(index)}
+                      sx={{ m: "s" }}
+                    >
+                      <Ionicons name="trash" size={22} color="red" />
+                    </Pressable>
+                  </View>
+                </Box>
+              ))}
+
+
+
+              <Button title="+ Add Ingredient" onPress={handleAddIngredientRow} color="$primary" />
+
+              {/* Instructions */}
+              <Text variant="heading">Instructions</Text>
+              <Box flexDir="column">
+                <UserInput
+                  label="Instructions"
+                  placeholder="Step-by-step Instructions"
+                  value={instructions}
+                  onChangeText={setInstructions}
+                  validate={validateInstructions}
+                  multiline
+                  onFocus={() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                  }}
+                />
+
+              </Box>
+
+              {/* Save */}
+
+              <Button title="Save Recipe" onPress={handleSaveRecipe} color="$accent" />
+
+            </View>
+          </TouchableWithoutFeedback>
+        </ScrollView>
+      </KeyboardAvoidingView>
     );
   }
 }

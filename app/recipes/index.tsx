@@ -1,3 +1,4 @@
+import Box from '@/components/Box'
 import { ScrollView, Text, View } from 'dripsy'
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
@@ -6,8 +7,6 @@ import { Animated, Image, Keyboard, Pressable } from 'react-native'
 import { SearchHeader } from '../../components/SearchHeader'
 import { supabase } from '../../utils/supabase'
 import Button from '../../components/Button'
-
-import Box from '@/components/Box'
 
 
 export default function RecipesListScreen() {
@@ -148,7 +147,6 @@ export default function RecipesListScreen() {
 
                     <Box
                         key={recipe.id}
-
                     >
                         <Text variant="heading">{recipe.title}</Text>
 
@@ -175,8 +173,6 @@ export default function RecipesListScreen() {
                         />
 
                     </Box>
-
-
 
 
                 ))
