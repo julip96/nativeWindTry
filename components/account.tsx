@@ -126,7 +126,7 @@ export default function Account({ session }: AccountProps) {
   if (!isEditing) {
     return (
       <View sx={{}}>
-        <Text variant="headingTwo">Account information</Text>
+        <Text variant="heading">Account information</Text>
         {/* <Avatar
           size={120}
           url={avatarUrl}
@@ -161,8 +161,9 @@ export default function Account({ session }: AccountProps) {
   //     FULL EDITOR VIEW
   // =========================
   return (
-    <View sx={{ padding: 16 }}>
-      <Avatar
+    <View sx={{}}>
+
+      {/*  <Avatar
         size={160}
         url={avatarUrl}
         onUpload={(path) => setAvatarUrl(path)}
@@ -196,38 +197,14 @@ export default function Account({ session }: AccountProps) {
         <Text sx={{ color: "white", fontWeight: "bold" }}>
           {loading ? "Saving..." : "Save"}
         </Text>
-      </Pressable>
+      </Pressable> */}
 
-      <Pressable
-        onPress={() => setIsEditing(false)}
-        sx={{
-          marginTop: 12,
-          paddingY: 10,
-          backgroundColor: "$mutedBackground",
-          borderRadius: 12,
-          alignItems: "center",
-        }}
-      >
-        <Text sx={{ color: "$text" }}>Cancel</Text>
-      </Pressable>
+      <Text variant="heading">Danger Zone</Text>
 
-      <ThemeCard sx={{ margin: 16 }}>
-        <H1 sx={{ fontSize: 22, marginBottom: 16, color: "$text" }}>
-          Delete Account
-        </H1>
+      <Button title="Delete Account" onPress={() => deleteAccount()} color='$accent' />
 
-        <ThemeButton
-          title="Delete Account"
-          onPress={() => deleteAccount()}
-          sx={{
-            flex: 1,
-            paddingY: 10,
-            borderRadius: 10,
-            alignItems: "center",
-            backgroundColor: "$primary",
-          }}
-        />
-      </ThemeCard>
+      <Button title="Go back" onPress={() => setIsEditing(false)} color='$primary' />
+
     </View>
   );
 }

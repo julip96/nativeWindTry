@@ -87,25 +87,6 @@ export default function RootLayout() {
 
         <SessionProvider>
           {Platform.OS === 'ios' ? (
-            /*
-            <SafeAreaView style={{ flex: 1 }}>
-              <NativeTabs>
-                <NativeTabs.Trigger name="index">
-                  <Icon sf="house.fill" />
-                  <Label>Home</Label>
-                </NativeTabs.Trigger>
-  
-                <NativeTabs.Trigger name="recipesListScreen">
-                  <Icon sf="fork.knife" />
-                  <Label>Recipes</Label>
-                </NativeTabs.Trigger>
-  
-                <NativeTabs.Trigger name="settings">
-                  <Icon sf="gear" />
-                  <Label>Settings</Label>
-                </NativeTabs.Trigger>
-              </NativeTabs>
-            </SafeAreaView> */
 
             <SafeAreaView style={{ flex: 1 }}>
               {/* Active screen */}

@@ -178,7 +178,6 @@ export default function RecipesListScreen() {
                 ))
             )}
 
-            <StatusBar style="dark" />
         </ScrollView>
     )
 }

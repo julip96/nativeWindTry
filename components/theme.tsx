@@ -48,6 +48,7 @@ const baseTheme = {
         body: {
             fontSize: 16,
             color: '$text',
+            paddingLeft: 8
         },
         heading: {
             fontSize: 22,
