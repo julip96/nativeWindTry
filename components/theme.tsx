@@ -52,8 +52,7 @@ const baseTheme = {
         },
         heading: {
             fontSize: 22,
-            color: '$accent',
-            padding: 8,
+            color: '$text',
             // fontFamily: fontName,
             // fontWeight: 'bold',
         },

@@ -232,8 +232,6 @@ export default function EditRecipeScreen() {
         }
     }
 
-    console.log("ingredients:", ingredients);
-
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}

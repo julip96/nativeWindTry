@@ -16,7 +16,6 @@ const Button = ({
 }: ButtonProps) => {
     return (
         <Pressable
-            onPress={onPress}
             sx={{
                 bg: color,
                 p: "m",
@@ -25,11 +24,7 @@ const Button = ({
                 alignItems: "center",
                 boxShadow: "md",
             }}
-            style={({ pressed }) => ({
-                opacity: pressed ? 0.6 : 1
-
-            })}
-
+            onPress={onPress}
         >
             <Text sx={{
                 color: "$textContrary",
