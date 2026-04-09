@@ -1,7 +1,6 @@
 import React, { use } from 'react'
 import { View, Text, ScrollView } from 'dripsy'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Alert, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '@/utils/supabase';
@@ -94,6 +93,7 @@ export default function RecipeDetailsScreen() {
                     {recipe.title}
 
                 </Text>
+
 
                 {recipe.image_url ? (
                     <Image

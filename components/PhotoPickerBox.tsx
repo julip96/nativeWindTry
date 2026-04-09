@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Image, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { View, Text } from "dripsy";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,28 +19,34 @@ export default function PhotoPickerBox({
         if (uri) setImageUri(uri);
     }, [uri]);
 
-    async function pickImage() {
-        try {
-            setLoading(true);
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                quality: 0.7,
-            });
+    function confirmDelete() {
+        Alert.alert(
+            "Delete Image",
+            "Are you sure you want to delete this image?",
+            [
+                { text: "Cancel", style: "cancel" },
+                { text: "Delete", style: "destructive", onPress: deleteImage },
+            ],
+            { cancelable: true }
+        );
+    }
 
-            if (!result.canceled) {
-                const newUri = result.assets[0].uri;
-                setImageUri(newUri);
-                onChange?.(newUri);
-            }
-        } catch (err) {
-            console.warn("Image pick error:", err);
+    async function deleteImage() {
+        setLoading(true);
+
+        try {
+            // Hier kannst du auch Supabase Storage löschen, falls du die Bilder dort speicherst
+            setImageUri(null);
+            onChange?.("");
+        } catch (e) {
+            console.error("Error deleting image: ", e);
         } finally {
             setLoading(false);
         }
     }
 
     return (
-        <TouchableOpacity onPress={pickImage} activeOpacity={0.85}>
+        <TouchableOpacity onPress={confirmDelete} activeOpacity={0.85}>
             <View
                 sx={{
                     width: "100%",

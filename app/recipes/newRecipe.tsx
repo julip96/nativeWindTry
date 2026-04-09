@@ -4,7 +4,7 @@ import { Picker } from "@react-native-picker/picker";
 import { Pressable, ScrollView, Text, TextInput, View } from "dripsy";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native";
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Image } from "react-native";
 import { supabase } from "../../utils/supabase";
 import Box from "@/components/Box";
 import UserInput from "@/components/UserInput";
@@ -190,15 +190,7 @@ export default function NewRecipe() {
     }
   }
 
-
-  const titleStyle = (field: string) => ({
-    fontWeight: "bold",
-    mb: "xs",
-    color: "$text",
-    fontSize: 16,
-  });
   const scrollViewRef = useRef<ScrollViewType | null>(null);
-
 
   if (Platform.OS === "ios") {
     return (
@@ -230,43 +222,20 @@ export default function NewRecipe() {
               <Box>
                 {!image && (
                   <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: "m" }}>
-                    <Pressable onPress={handlePickImage}>
-                      <View
-                        sx={{
-                          bg: "$secondary",
-                          p: "m",
-                          borderRadius: "m",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: 150,
-                        }}
-                      >
-                        <Text sx={{ color: "white", fontWeight: "bold" }}>From Gallery</Text>
-                      </View>
-                    </Pressable>
 
-                    <Pressable onPress={handleTakePhoto}>
-                      <View
-                        sx={{
-                          bg: "$primary",
-                          p: "m",
-                          borderRadius: "m",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: 150,
-                        }}
-                      >
-                        <Text sx={{ color: "white", fontWeight: "bold" }}>Take Photo</Text>
-                      </View>
-                    </Pressable>
+                    <Button title="From Gallery" onPress={handlePickImage} color="$secondary" />
+                    <Button title="Take Photo" onPress={handleTakePhoto} color="$primary" />
                   </View>
                 )}
 
                 {/* 🖼 Bildanzeige – IDENTISCH zu NewRecipe */}
                 {image && (
+
+
                   <PhotoPickerBox onChange={setImage} uri={image} />
                 )}
               </Box>
+
               {/* Cookbook */}
               <Text variant="heading">Cookbook</Text>
 
