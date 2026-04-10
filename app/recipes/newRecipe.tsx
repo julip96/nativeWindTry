@@ -57,7 +57,7 @@ export default function NewRecipe() {
       else setBooks(booksData || []);
 
       // falls ein book_id übergeben wurde, sicherstellen dass es existiert
-      if (book_id && booksData?.some((b) => b.id === book_id)) {
+      if (book_id && typeof book_id === "string" && booksData?.some((b) => b.id === book_id)) {
         setSelectedBookId(book_id as string);
       }
     };

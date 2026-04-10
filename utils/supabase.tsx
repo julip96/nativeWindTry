@@ -1,10 +1,15 @@
 import 'expo-sqlite/localStorage/install';
 import { createClient } from '@supabase/supabase-js';
+import Constants from 'expo-constants';
 
-const supabaseUrl = 'https://yzoyrioiagjzkzmaoblo.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6b3lyaW9pYWdqemt6bWFvYmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5ODA0MTIsImV4cCI6MjA3NjU1NjQxMn0.sFlPko84bgpc4BVrdrrWOphajspmESGYnzkKwaOihz4';
+const supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl;
+const supabaseAnonKey = Constants.expoConfig?.extra?.supabaseAnonKey;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase URL or anon key is missing. Check your environment variables.');
+}
+
+export const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
     auth: {
         storage: localStorage,
         autoRefreshToken: true,
