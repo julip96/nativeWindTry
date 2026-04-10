@@ -17,7 +17,7 @@ export default function RecipesTabLayout() {
                 name="newRecipe"
                 options={{
                     title: 'New Recipe',
-                    presentation: 'modal',
+                    // presentation: 'modal',
                 }}
             />
             <Stack.Screen

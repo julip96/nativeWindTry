@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+
 import type { ScrollView as ScrollViewType } from 'react-native';
 import { Alert, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 
 import { Ionicons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
-import { Pressable, ScrollView, Text, TextInput, View } from "dripsy";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+
+import { Pressable, ScrollView, Text, TextInput, View } from "dripsy";
 
 import { supabase } from "@/utils/supabase";
 import Box from "@/components/Box";
@@ -115,15 +117,6 @@ export default function NewRecipe() {
 
     }
 
-    // validate ingredients
-    const validIngredients = ingredients
-      .filter((i) => i.name.trim() !== "")
-      .map((i) => ({
-        name: i.name.trim(),
-        amount: i.amount ? parseFloat(i.amount) : null,
-        unit: i.unit || "g",
-      }));
-
     try {
 
       const { data: recipeData, error } = await supabase
@@ -135,7 +128,7 @@ export default function NewRecipe() {
             title,
             instructions,
             image_url: image,
-            ingredients: JSON.stringify(validIngredients),
+            ingredients: JSON.stringify(ingredients),
             rating: 0,
             private: true,
           },
@@ -219,153 +212,154 @@ export default function NewRecipe() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0} // je nach Header-Höhe anpassen
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
 
-        <ScrollView sx={{ p: "m", bg: "$background", flex: 1, }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          sx={{
+            p: "m",
+            bg: "$background",
+            flex: 1,
+          }}
+          keyboardShouldPersistTaps="handled"
+          ref={scrollViewRef}
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
 
-          <TouchableWithoutFeedback
-            onPress={() => {
-              Keyboard.dismiss();
-            }}
-          >
 
-            <View>
 
-              <Text variant="heading">Recipe Title</Text>
+          <View>
 
-              <UserInput
-                label="Title"
-                placeholder="e.g. Creamy Mushroom Pasta"
-                value={title}
-                onChangeText={setTitle}
-                validate={validateName}
-              />
+            <Text variant="heading">Recipe Title</Text>
 
-              <Text variant="heading">Image</Text>
+            <UserInput
+              label="Title"
+              placeholder="e.g. Creamy Mushroom Pasta"
+              value={title}
+              onChangeText={setTitle}
+              validate={validateName}
+            />
 
-              {/* Show image if exists, otherwise show image picker buttons */}
-              <Box>
-                {!image && (
-                  <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: "m" }}>
+            <Text variant="heading">Image</Text>
 
-                    <Button title="From Gallery" onPress={handlePickImage} color="$secondary" />
-                    <Button title="Take Photo" onPress={handleTakePhoto} color="$primary" />
-                  </View>
-                )}
+            {/* Show image if exists, otherwise show image picker buttons */}
+            <Box>
+              {!image && (
+                <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: "m" }}>
 
-                {image && (
+                  <Button title="From Gallery" onPress={handlePickImage} color="$secondary" />
+                  <Button title="Take Photo" onPress={handleTakePhoto} color="$primary" />
+                </View>
+              )}
 
-                  <PhotoPickerBox onChange={setImage} uri={image} />
-                )}
-              </Box>
+              {image && (
 
-              {/* Cookbook */}
-              <Text variant="heading">Cookbook</Text>
+                <PhotoPickerBox onChange={setImage} uri={image} />
+              )}
+            </Box>
 
-              <Box>
+            {/* Cookbook */}
+            <Text variant="heading">Cookbook</Text>
+
+            <Box>
+
+              <Picker
+                selectedValue={selectedBookId ? selectedBookId : null}
+                onValueChange={(val) => {
+                  setSelectedBookId(val);
+                }}
+                style={{
+                  height: 200,
+                  width: 300,
+                }}
+                itemStyle={{ color: "black" }}
+              >
+
+                <Picker.Item label="No specific cookbook" value={null} style={{ height: 200 }} />
+                {books.map((b) => (
+                  <Picker.Item key={b.id} label={b.name} value={b.id} />
+                ))}
+
+              </Picker>
+
+            </Box>
+
+            {/* Map all existing ingredients for this recipe and input fields to change its values */}
+            <Text variant="heading">Ingredients</Text>
+
+            {ingredients.map((item, index) => (
+              <Box key={index} flexDir="column">
+
+                <UserInput
+                  label="Name"
+                  placeholder="Type in ingredient name here"
+                  value={item.name}
+                  onChangeText={(text) =>
+                    handleIngredientChange(index, "name", text)
+                  }
+                  validate={validateName}
+                />
+
+                <UserInput
+                  label="Amount"
+                  placeholder="Type in amount here"
+                  value={item.amount}
+                  onChangeText={(text) =>
+                    handleIngredientChange(index, "amount", text)
+                  }
+                  validate={validateAmount}
+                />
 
                 <Picker
-                  selectedValue={selectedBookId ? selectedBookId : null}
+                  selectedValue={item.unit}
                   onValueChange={(val) => {
-                    setSelectedBookId(val);
-                  }}
-                  style={{
-                    height: 200,
-                    width: 300,
-
+                    handleIngredientChange(index, "unit", val);
                   }}
                   itemStyle={{ color: "black" }}
                 >
-
-                  <Picker.Item label="No specific cookbook" value={null} style={{ height: 200 }} />
-                  {books.map((b) => (
-                    <Picker.Item key={b.id} label={b.name} value={b.id} />
+                  {units.map((u) => (
+                    <Picker.Item key={u} label={u} value={u} />
                   ))}
-
                 </Picker>
 
+                <Pressable
+                  onPress={() => handleRemoveIngredient(index)}
+                  sx={{ m: "s", alignSelf: "flex-end" }}
+
+                >
+                  <Ionicons name="trash" size={22} color="red" />
+                </Pressable>
+
               </Box>
+            ))}
 
-              {/* Map all existing ingredients for this recipe and input fields to change its values */}
-              <Text variant="heading">Ingredients</Text>
+            {/* Add another ingredient */}
+            <Button title="+ Add Ingredient" onPress={handleAddIngredientRow} color="$primary" />
 
-              {ingredients.map((item, index) => (
-                <Box key={index} flexDir="column">
+            {/* Add instructions */}
+            <Text variant="heading">Instructions</Text>
 
-                  <UserInput
-                    label="Name"
-                    placeholder="Type in ingredient name here"
-                    value={item.name}
-                    onChangeText={(text) =>
-                      handleIngredientChange(index, "name", text)
-                    }
-                    validate={validateName}
-                  />
+            <UserInput
+              label="Instructions"
+              placeholder="Step-by-step Instructions"
+              value={instructions}
+              onChangeText={setInstructions}
+              validate={validateInstructions}
+              multiline
+              onFocus={() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true });
+              }}
+            />
 
-                  <UserInput
-                    label="Amount"
-                    placeholder="Type in amount here"
-                    value={item.amount}
-                    onChangeText={(text) =>
-                      handleIngredientChange(index, "amount", text)
-                    }
-                    validate={validateAmount}
-                  />
+            {/* Save recipe*/}
+            <Button
+              title={savingRecipe ? "Saving..." : "Save Recipe"}
+              onPress={handleSaveRecipe}
+              disabled={savingRecipe}
+              color="$accent"
+            />
 
-                  <Picker
-                    selectedValue={item.unit}
-                    onValueChange={(val) => {
-                      handleIngredientChange(index, "unit", val);
-                    }}
-                    itemStyle={{ color: "black" }}
-                  >
-                    {units.map((u) => (
-                      <Picker.Item key={u} label={u} value={u} />
-                    ))}
-                  </Picker>
-
-                  <Pressable
-                    onPress={() => handleRemoveIngredient(index)}
-                    sx={{ m: "s", alignSelf: "flex-end" }}
-
-                  >
-                    <Ionicons name="trash" size={22} color="red" />
-                  </Pressable>
-
-                </Box>
-              ))}
-
-              {/* Add another ingredient */}
-              <Button title="+ Add Ingredient" onPress={handleAddIngredientRow} color="$primary" />
-
-              {/* Add instructions */}
-              <Text variant="heading">Instructions</Text>
-
-              <UserInput
-                label="Instructions"
-                placeholder="Step-by-step Instructions"
-                value={instructions}
-                onChangeText={setInstructions}
-                validate={validateInstructions}
-                multiline
-                onFocus={() => {
-                  scrollViewRef.current?.scrollToEnd({ animated: true });
-                }}
-              />
-
-              {/* Save recipe*/}
-              <Button
-                title={savingRecipe ? "Saving..." : "Save Recipe"}
-                onPress={handleSaveRecipe}
-                disabled={savingRecipe}
-                color="$accent"
-              />
-
-            </View>
-
-          </TouchableWithoutFeedback>
+          </View>
 
         </ScrollView>
 

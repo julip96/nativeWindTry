@@ -53,7 +53,7 @@ export default function RootLayout() {
     { name: 'recipeBooks', label: 'Books', path: '/recipeBooks' },
     { name: 'recipes', label: 'Recipes', path: '/recipes' },
     { name: 'settings', label: 'Settings', path: '/settings' },
-    { name: 'test', label: 'Test', path: '/test' },
+    //{ name: 'test', label: 'Test', path: '/test' },
   ]
 
   // If no session, show Auth screen instead of tabs

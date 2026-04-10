@@ -57,8 +57,8 @@ export default function EditRecipeScreen() {
     const validateAmount = (text: string) => {
         if (!text || text.trim().length === 0) return 'Amount darf nicht leer sein';
 
-        // Prüfen, ob nur Zahlen (0-9) eingegeben wurden
-        const numberOnlyRegex = /^[0-9]+$/;
+        // Check if only numbers (0-9) and optionally a decimal point were entered
+        const numberOnlyRegex = /^[0-9]*\.?[0-9]+$/;
         if (!numberOnlyRegex.test(text)) return 'Bitte nur Zahlen eingeben';
 
         if (text.length < 1) return 'Amount muss mindestens 1 Zeichen lang sein';

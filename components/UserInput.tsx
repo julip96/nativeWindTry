@@ -87,6 +87,7 @@ const UserInput: React.FC<UserInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     margin: 8,
     padding: Platform.select({ ios: 16, android: 8 }),
     marginVertical: 8,
