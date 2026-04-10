@@ -18,23 +18,14 @@ import Button from '../components/Button';
 
 import UserInput from '@/components/UserInput';
 
+import { supabase } from '@/utils/supabase';
+
 export default function Test() {
 
+
+    const [loading, setLoading] = useState(false)
+
     const [isFocused, setIsFocused] = useState(false);
-
-    const [focusedInput, setFocusedInput] = useState<string | null>(null);
-
-    const [values, setValues] = useState({
-        underline: '',
-        boxed: '',
-        animated: '',
-        floating: '',
-        glow: '',
-        design1: '',
-        design2: '',
-        design3: '',
-        design4: '',
-    });
 
     const validateName = (text: string) => {
         if (!text || text.trim().length === 0) return 'Name darf nicht leer sein';
@@ -54,13 +45,6 @@ export default function Test() {
         return true;
     };
 
-
-    const [name, setName] = useState('');
-
-    const handleChange = (key: string, text: string) => {
-        setValues(v => ({ ...v, [key]: text }));
-    };
-
     const [ingredientName, setIngredientName] = useState('');
 
     const [ingredientAmount, setIngredientAmount] = useState('');
@@ -73,31 +57,7 @@ export default function Test() {
         { amount: string; unit: string; name: string }[]
     >([{ amount: "", unit: "g", name: "" }]);
 
-    const handleAddIngredientRow = () => {
-        setIngredients([...ingredients, { amount: "", unit: "g", name: "" }]);
-    };
-
-    const handleIngredientChange = (
-        index: number,
-        field: "amount" | "unit" | "name",
-        value: string,
-    ) => {
-        const updated = [...ingredients];
-        updated[index][field] = value;
-        setIngredients(updated);
-    }
-
-    const handleRemoveIngredient = (index: number) => {
-        setIngredients(ingredients.filter((_, i) => i !== index));
-    };
-
-    ;
-
     const router = useRouter();
-
-
-    const bc = "white"
-    const [text, setText] = useState('')
 
     // function for testing textinput style
     const borderAnim = useRef(new Animated.Value(0)).current;
@@ -108,13 +68,6 @@ export default function Test() {
             useNativeDriver: false,
         }).start();
     }, [isFocused]);
-
-    const borderColor = borderAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['transparent', '#007AFF'],
-    });
-
-    const showLabel = isFocused || text.length > 0;
 
     return (
 

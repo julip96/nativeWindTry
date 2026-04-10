@@ -91,8 +91,8 @@ export default function PhotoPickerBox({
                             gap: 6,
                         }}
                     >
-                        <Ionicons name="swap-horizontal" size={16} color="white" />
-                        <Text sx={{ color: "white", fontSize: 14 }}>Change</Text>
+                        <Ionicons name="trash" size={16} color="red" />
+                        <Text sx={{ color: "white", fontSize: 14 }}>Delete</Text>
                     </View>
                 )}
             </View>

@@ -1,45 +1,40 @@
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { ScrollView as ScrollViewType } from 'react-native';
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { Pressable, ScrollView, Text, TextInput, View } from "dripsy";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Image } from "react-native";
-import { supabase } from "../../utils/supabase";
+import * as ImagePicker from "expo-image-picker";
+
+import { supabase } from "@/utils/supabase";
 import Box from "@/components/Box";
 import UserInput from "@/components/UserInput";
 import Button from "@/components/Button";
 import PhotoPickerBox from '@/components/PhotoPickerBox';
-import * as ImagePicker from "expo-image-picker";
 
 export default function NewRecipe() {
-  const { book_id } = useLocalSearchParams(); // optional vorgegebene Kochbuch-ID
+
   const router = useRouter();
+
+  // optional given cookbook-ID
+  const { book_id } = useLocalSearchParams();
+
+  // Cookbooks
+  const [books, setBooks] = useState<{ id: string; name: string }[]>([]);
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
   const [userId, setUserId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [image, setImage] = useState<string | null>(null);
 
-  const [focusedField, setFocusedField] = useState<string | null>(null);
-  // Kochbücher
-  const [books, setBooks] = useState<{ id: string; name: string }[]>([]);
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
-
-  // Zutaten
+  // Ingredients
   const [ingredients, setIngredients] = useState<
     { amount: string; unit: string; name: string }[]
   >([{ amount: "", unit: "g", name: "" }]);
-
   const units = ["-", "g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"];
-
-  const handleFocus = (field: string) => {
-    setFocusedField(field);
-  };
-
-  const clearFocus = () => {
-    setFocusedField(null);
-  };
 
   // 👤 Lade User und Kochbücher
   useEffect(() => {
@@ -71,23 +66,29 @@ export default function NewRecipe() {
   }, []);
 
   // 🧾 Zutatenzeilen-Funktionen
-  const handleIngredientChange = (
-    index: number,
-    field: "amount" | "unit" | "name",
-    value: string,
-  ) => {
-    const updated = [...ingredients];
-    updated[index][field] = value;
-    setIngredients(updated);
-  };
+  const handleIngredientChange = useCallback(
+    (
+      index: number,
+      field: "amount" | "unit" | "name",
+      value: string,
+    ) => {
+      setIngredients((prev) => {
+        const updated = [...prev];
+        updated[index][field] = value;
+        return updated;
+        //const updated = [...ingredients];
+        //updated[index][field] = value;
+        //setIngredients(updated);
+      });
+    }, []);
 
-  const handleAddIngredientRow = () => {
-    setIngredients([...ingredients, { amount: "", unit: "g", name: "" }]);
-  };
+  const handleAddIngredientRow = useCallback(() => {
+    setIngredients((prev) => [...prev, { amount: "", unit: "g", name: "" }]);
+  }, []);
 
-  const handleRemoveIngredient = (index: number) => {
-    setIngredients(ingredients.filter((_, i) => i !== index));
-  };
+  const handleRemoveIngredient = useCallback((index: number) => {
+    setIngredients((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   // 💾 Save Recipe
   const handleSaveRecipe = async () => {
@@ -130,33 +131,31 @@ export default function NewRecipe() {
     }
   };
 
-
-
   const validateName = (text: string) => {
-    if (!text || text.trim().length === 0) return 'Name darf nicht leer sein';
-    if (text.length < 3) return 'Name muss mindestens 3 Zeichen lang sein';
+    if (!text || text.trim().length === 0) return 'Name cannot be empty';
+    if (text.length < 3) return 'Name must be at least 3 characters long';
     return true;
   };
 
   const validateInstructions = (text: string) => {
-    if (!text || text.trim().length === 0) return 'Instructions darf nicht leer sein';
-    if (text.length < 3) return 'Instructions muss mindestens 3 Zeichen lang sein';
+    if (!text || text.trim().length === 0) return 'Instructions cannot be empty';
+    if (text.length < 3) return 'Instructions must be at least 3 characters long';
     return true;
   };
 
   const validateAmount = (text: string) => {
-    if (!text || text.trim().length === 0) return 'Amount darf nicht leer sein';
+    if (!text || text.trim().length === 0) return 'Amount cannot be empty';
 
-    // Prüfen, ob nur Zahlen (0-9) eingegeben wurden
-    const numberOnlyRegex = /^[0-9]+$/;
-    if (!numberOnlyRegex.test(text)) return 'Bitte nur Zahlen eingeben';
+    // Check if only numbers (0-9) and optionally a decimal point were entered
+    const numberOnlyRegex = /^[0-9]*\.?[0-9]+$/;
+    if (!numberOnlyRegex.test(text)) return 'Please enter only numbers';
 
-    if (text.length < 1) return 'Amount muss mindestens 1 Zeichen lang sein';
+    if (text.length < 1) return 'Amount must be at least 1 character long';
 
     return true;
   };
 
-  async function handlePickImage() {
+  const handlePickImage = useCallback(async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert("Permission required", "We need access to your photos!");
@@ -171,9 +170,9 @@ export default function NewRecipe() {
     if (!result.canceled && result.assets.length > 0) {
       setImage(result.assets[0].uri);
     }
-  }
+  }, []);
 
-  async function handleTakePhoto() {
+  const handleTakePhoto = useCallback(async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
       Alert.alert("Permission required", "We need access to your camera!");
@@ -188,24 +187,27 @@ export default function NewRecipe() {
     if (!result.canceled && result.assets.length > 0) {
       setImage(result.assets[0].uri);
     }
-  }
+  }, []);
 
   const scrollViewRef = useRef<ScrollViewType | null>(null);
 
   if (Platform.OS === "ios") {
     return (
+
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0} // je nach Header-Höhe anpassen
       >
+
         <ScrollView sx={{ p: "m", bg: "$background", flex: 1, }} keyboardShouldPersistTaps="handled">
+
           <TouchableWithoutFeedback
             onPress={() => {
               Keyboard.dismiss();
-              setFocusedField(null);
             }}
           >
+
             <View>
 
               <Text variant="heading">Recipe Title</Text>
@@ -217,8 +219,10 @@ export default function NewRecipe() {
                 onChangeText={setTitle}
                 validate={validateName}
               />
+
               <Text variant="heading">Image</Text>
-              {/* 📸 Bildpicker Buttons */}
+
+              {/* Show image if exists, otherwise show image picker buttons */}
               <Box>
                 {!image && (
                   <View sx={{ flexDirection: "row", justifyContent: "space-between", mb: "m" }}>
@@ -228,9 +232,7 @@ export default function NewRecipe() {
                   </View>
                 )}
 
-                {/* 🖼 Bildanzeige – IDENTISCH zu NewRecipe */}
                 {image && (
-
 
                   <PhotoPickerBox onChange={setImage} uri={image} />
                 )}
@@ -239,32 +241,33 @@ export default function NewRecipe() {
               {/* Cookbook */}
               <Text variant="heading">Cookbook</Text>
 
-              <Picker
-                // changed from {selectedBookId}
-                selectedValue={selectedBookId ? selectedBookId : null}
-                onFocus={() => handleFocus("book")}
-                onValueChange={(val) => {
-                  setSelectedBookId(val);
-                  setFocusedField(null);
-                }}
-                style={{
-                  height: 200,
-                  width: 300
+              <Box>
 
-                }}
-                itemStyle={{ color: "black" }}
-              >
-                <Picker.Item label="No specific cookbook" value={null} style={{ height: 200 }} />
-                {books.map((b) => (
-                  <Picker.Item key={b.id} label={b.name} value={b.id} />
-                ))}
-              </Picker>
+                <Picker
+                  selectedValue={selectedBookId ? selectedBookId : null}
+                  onValueChange={(val) => {
+                    setSelectedBookId(val);
+                  }}
+                  style={{
+                    height: 200,
+                    width: 300,
 
+                  }}
+                  itemStyle={{ color: "black" }}
+                >
 
-              {/* 🧂 Zutaten */}
+                  <Picker.Item label="No specific cookbook" value={null} style={{ height: 200 }} />
+                  {books.map((b) => (
+                    <Picker.Item key={b.id} label={b.name} value={b.id} />
+                  ))}
+
+                </Picker>
+
+              </Box>
+
+              {/* Map all existing ingredients for this recipe and input fields to change its values */}
               <Text variant="heading">Ingredients</Text>
 
-              {/* has shadow */}
               {ingredients.map((item, index) => (
                 <Box key={index} flexDir="column">
 
@@ -288,13 +291,10 @@ export default function NewRecipe() {
                     validate={validateAmount}
                   />
 
-
                   <Picker
                     selectedValue={item.unit}
-                    onFocus={() => handleFocus(`unit-${index}`)}
                     onValueChange={(val) => {
                       handleIngredientChange(index, "unit", val);
-                      setFocusedField(null);
                     }}
                     itemStyle={{ color: "black" }}
                   >
@@ -302,8 +302,6 @@ export default function NewRecipe() {
                       <Picker.Item key={u} label={u} value={u} />
                     ))}
                   </Picker>
-
-
 
                   <Pressable
                     onPress={() => handleRemoveIngredient(index)}
@@ -316,8 +314,10 @@ export default function NewRecipe() {
                 </Box>
               ))}
 
+              {/* Add another ingredient */}
               <Button title="+ Add Ingredient" onPress={handleAddIngredientRow} color="$primary" />
 
+              {/* Add instructions */}
               <Text variant="heading">Instructions</Text>
 
               <UserInput
@@ -332,16 +332,17 @@ export default function NewRecipe() {
                 }}
               />
 
-
-
-              {/* Save */}
-
+              {/* Save recipe*/}
               <Button title="Save Recipe" onPress={handleSaveRecipe} color="$accent" />
 
             </View>
+
           </TouchableWithoutFeedback>
+
         </ScrollView>
+
       </KeyboardAvoidingView>
+
     );
 
   } else {
@@ -355,7 +356,6 @@ export default function NewRecipe() {
           <TouchableWithoutFeedback
             onPress={() => {
               Keyboard.dismiss();
-              setFocusedField(null);
             }}
           >
             <View>
@@ -419,10 +419,8 @@ export default function NewRecipe() {
               <Box>
                 <Picker
                   selectedValue={selectedBookId}
-                  onFocus={() => handleFocus("book")}
                   onValueChange={(val) => {
                     setSelectedBookId(val);
-                    setFocusedField(null);
                   }}
                 >
                   <Picker.Item label="Select a cookbook" value={null} />
@@ -449,7 +447,6 @@ export default function NewRecipe() {
                       placeholder="Amt"
                       value={item.amount}
                       keyboardType="numeric"
-                      onFocus={() => handleFocus(`amt-${index}`)}
                       onChangeText={(text) =>
                         handleIngredientChange(index, "amount", text)
                       }
@@ -465,10 +462,8 @@ export default function NewRecipe() {
                     >
                       <Picker
                         selectedValue={item.unit}
-                        onFocus={() => handleFocus(`unit-${index}`)}
                         onValueChange={(val) => {
                           handleIngredientChange(index, "unit", val);
-                          setFocusedField(null);
                         }}
                       >
                         {units.map((u) => (
@@ -484,7 +479,6 @@ export default function NewRecipe() {
                       }}
                       placeholder="Ingredient Name"
                       value={item.name}
-                      onFocus={() => handleFocus(`name-${index}`)}
                       onChangeText={(text) =>
                         handleIngredientChange(index, "name", text)
                       }
