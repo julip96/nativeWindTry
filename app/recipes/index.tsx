@@ -7,6 +7,7 @@ import { Animated, Image, Keyboard, Pressable } from 'react-native'
 import { SearchHeader } from '../../components/SearchHeader'
 import { supabase } from '../../utils/supabase'
 import Button from '../../components/Button'
+import { ActivityIndicator } from 'react-native'
 
 
 export default function RecipesListScreen() {
@@ -137,7 +138,13 @@ export default function RecipesListScreen() {
 
             {/* Recipe cards */}
             {loading ? (
-                <Text>Loading recipes...</Text>
+
+                <View sx={{ alignItems: 'center', marginTop: 20 }}>
+
+                    <ActivityIndicator size="large" />
+
+                </View>
+
             ) : filteredRecipes.length === 0 ? (
                 <Text>
                     {book_id ? 'No recipes found in this book.' : 'No recipes found.'}

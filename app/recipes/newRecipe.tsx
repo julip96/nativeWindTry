@@ -18,6 +18,9 @@ export default function NewRecipe() {
 
   const router = useRouter();
 
+  // loading states
+  const [savingRecipe, setSavingRecipe] = useState(false);
+
   // optional given cookbook-ID
   const { book_id } = useLocalSearchParams();
 
@@ -38,31 +41,44 @@ export default function NewRecipe() {
 
   // 👤 Lade User und Kochbücher
   useEffect(() => {
+
     const fetchUserAndBooks = async () => {
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-      if (userError || !userData.user) {
-        console.error("Error fetching user:", userError);
-        return;
+
+      try {
+
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+
+        if (userError || !userData.user) {
+
+          console.error("Error fetching user:", userError);
+          return;
+
+        }
+
+        setUserId(userData.user.id);
+
+        const { data: booksData, error: booksError } = await supabase
+          .from("recipe_books")
+          .select("*")
+          .eq("owner_id", userData.user.id)
+          .order("name");
+
+        if (booksError) console.error("Error fetching cookbooks:", booksError);
+        else setBooks(booksData || []);
+
+        // check if id exists and belongs to user, then set as selected
+        if (book_id && typeof book_id === "string" && booksData?.some((b) => b.id === book_id)) {
+          setSelectedBookId(book_id as string);
+        }
+
+      } finally {
+
       }
-      setUserId(userData.user.id);
 
-      const { data: booksData, error: booksError } = await supabase
-        .from("recipe_books")
-        .select("*")
-        .eq("owner_id", userData.user.id)
-        .order("name");
-
-      if (booksError) console.error("Error fetching cookbooks:", booksError);
-      else setBooks(booksData || []);
-
-      // falls ein book_id übergeben wurde, sicherstellen dass es existiert
-      if (book_id && typeof book_id === "string" && booksData?.some((b) => b.id === book_id)) {
-        setSelectedBookId(book_id as string);
-      }
     };
 
     fetchUserAndBooks();
+
   }, []);
 
   // 🧾 Zutatenzeilen-Funktionen
@@ -90,12 +106,16 @@ export default function NewRecipe() {
     setIngredients((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
-  // 💾 Save Recipe
+  // Save Recipe
   const handleSaveRecipe = async () => {
-    if (!userId || !selectedBookId)
+
+    if (!userId || !selectedBookId) {
+
       return Alert.alert("Error", "Missing user or cookbook");
 
-    // Zutaten validieren
+    }
+
+    // validate ingredients
     const validIngredients = ingredients
       .filter((i) => i.name.trim() !== "")
       .map((i) => ({
@@ -105,6 +125,7 @@ export default function NewRecipe() {
       }));
 
     try {
+
       const { data: recipeData, error } = await supabase
         .from("recipes")
         .insert([
@@ -128,6 +149,8 @@ export default function NewRecipe() {
     } catch (e) {
       console.error("Error saving recipe:", e);
       Alert.alert("Error", "Could not save recipe.");
+    } finally {
+      setSavingRecipe(false);
     }
   };
 
@@ -333,7 +356,12 @@ export default function NewRecipe() {
               />
 
               {/* Save recipe*/}
-              <Button title="Save Recipe" onPress={handleSaveRecipe} color="$accent" />
+              <Button
+                title={savingRecipe ? "Saving..." : "Save Recipe"}
+                onPress={handleSaveRecipe}
+                disabled={savingRecipe}
+                color="$accent"
+              />
 
             </View>
 

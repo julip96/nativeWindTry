@@ -10,6 +10,7 @@ import Auth from '@/components/Auth'
 import { SessionProvider } from '../components/SessionProvider'
 import { ThemeProvider } from '../components/ThemeProvider'
 import { supabase } from '../utils/supabase'
+import { Provider as PaperProvider } from 'react-native-paper'
 
 type TabConfig = {
   name: string
@@ -86,169 +87,174 @@ export default function RootLayout() {
       <SafeAreaProvider>
 
         <SessionProvider>
-          {Platform.OS === 'ios' ? (
 
-            <SafeAreaView style={{ flex: 1 }}>
-              {/* Active screen */}
+          <PaperProvider>
 
-              <View sx={{ flex: 1 }}>
+            {Platform.OS === 'ios' ? (
 
-                <Slot />
+              <SafeAreaView style={{ flex: 1 }}>
+                {/* Active screen */}
 
-              </View>
+                <View sx={{ flex: 1 }}>
 
-              {/* Bottom tab bar */}
-              <View
+                  <Slot />
 
-                sx={{
+                </View>
 
-                  height: 60,
-                  flexDirection: 'row',
-                  borderTopWidth: 1,
-                  borderColor: '$border',
-                  backgroundColor: '$background',
+                {/* Bottom tab bar */}
+                <View
 
-                }}
+                  sx={{
 
-              >
+                    height: 60,
+                    flexDirection: 'row',
+                    borderTopWidth: 1,
+                    borderColor: '$border',
+                    backgroundColor: '$background',
 
-                {tabs.map((tab) => {
+                  }}
 
-                  const isActive = activeRoute === tab.name
+                >
 
-                  return (
+                  {tabs.map((tab) => {
 
-                    <Pressable
+                    const isActive = activeRoute === tab.name
 
-                      key={tab.name}
+                    return (
 
-                      sx={{
+                      <Pressable
 
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        backgroundColor: isActive ? '$primary' : '$background',
-
-                      }}
-
-                      onPress={() => {
-
-                        // Always dismiss keyboard when switching tabs
-                        Keyboard.dismiss()
-
-                        if (!isActive) router.push(tab.path)
-
-                      }}
-
-                    >
-
-                      <Text
+                        key={tab.name}
 
                         sx={{
 
-                          color: isActive ? '$textOnPrimary' : '$text',
-                          fontWeight: isActive ? '600' : '400',
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: isActive ? '$primary' : '$background',
+
+                        }}
+
+                        onPress={() => {
+
+                          // Always dismiss keyboard when switching tabs
+                          Keyboard.dismiss()
+
+                          if (!isActive) router.push(tab.path)
 
                         }}
 
                       >
 
-                        {tab.label}
+                        <Text
 
-                      </Text>
+                          sx={{
 
-                    </Pressable>
+                            color: isActive ? '$textOnPrimary' : '$text',
+                            fontWeight: isActive ? '600' : '400',
 
-                  )
+                          }}
 
-                })}
+                        >
 
-              </View>
+                          {tab.label}
 
-            </SafeAreaView>
+                        </Text>
 
-          ) : (
+                      </Pressable>
 
-            <SafeAreaView style={{ flex: 1 }}>
+                    )
 
-              {/* Active screen */}
-              <View sx={{ flex: 1 }}>
+                  })}
 
-                <Slot />
+                </View>
 
-              </View>
+              </SafeAreaView>
 
-              {/* Bottom tab bar */}
-              <View
+            ) : (
 
-                sx={{
+              <SafeAreaView style={{ flex: 1 }}>
 
-                  height: 60,
-                  flexDirection: 'row',
-                  borderTopWidth: 1,
-                  borderColor: '$border',
-                  backgroundColor: '$background',
+                {/* Active screen */}
+                <View sx={{ flex: 1 }}>
 
-                }}
+                  <Slot />
 
-              >
+                </View>
 
-                {tabs.map((tab) => {
+                {/* Bottom tab bar */}
+                <View
 
-                  const isActive = activeRoute === tab.name
+                  sx={{
 
-                  return (
+                    height: 60,
+                    flexDirection: 'row',
+                    borderTopWidth: 1,
+                    borderColor: '$border',
+                    backgroundColor: '$background',
 
-                    <Pressable
+                  }}
 
-                      key={tab.name}
+                >
 
-                      sx={{
+                  {tabs.map((tab) => {
 
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        backgroundColor: isActive ? '$primary' : '$background',
+                    const isActive = activeRoute === tab.name
 
-                      }}
+                    return (
 
-                      onPress={() => {
+                      <Pressable
 
-                        // Always dismiss keyboard when switching tabs
-                        Keyboard.dismiss()
-
-                        if (!isActive) router.push(tab.path)
-
-                      }}
-
-                    >
-
-                      <Text
+                        key={tab.name}
 
                         sx={{
 
-                          color: isActive ? '$textOnPrimary' : '$text',
-                          fontWeight: isActive ? '600' : '400',
+                          flex: 1,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: isActive ? '$primary' : '$background',
+
+                        }}
+
+                        onPress={() => {
+
+                          // Always dismiss keyboard when switching tabs
+                          Keyboard.dismiss()
+
+                          if (!isActive) router.push(tab.path)
 
                         }}
 
                       >
 
-                        {tab.label}
+                        <Text
 
-                      </Text>
+                          sx={{
 
-                    </Pressable>
+                            color: isActive ? '$textOnPrimary' : '$text',
+                            fontWeight: isActive ? '600' : '400',
 
-                  )
+                          }}
 
-                })}
+                        >
 
-              </View>
+                          {tab.label}
 
-            </SafeAreaView>
+                        </Text>
 
-          )}
+                      </Pressable>
+
+                    )
+
+                  })}
+
+                </View>
+
+              </SafeAreaView>
+
+            )}
+
+          </PaperProvider>
 
         </SessionProvider>
 

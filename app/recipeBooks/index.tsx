@@ -4,6 +4,7 @@ import { ScrollView, Text, View } from 'dripsy';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Animated, Keyboard, Pressable } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { SearchHeader } from '../../components/SearchHeader';
 import { supabase } from '../../utils/supabase';
 
@@ -11,6 +12,7 @@ export default function RecipeBooksScreen() {
 
     const router = useRouter();
     const [books, setBooks] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearching, setIsSearching] = useState(false);
 
@@ -21,6 +23,7 @@ export default function RecipeBooksScreen() {
 
     useEffect(() => {
         const loadBooks = async () => {
+            setLoading(true);
             // RLS will already limit to the books the current user owns or is collaborator on
             const { data, error } = await supabase
                 .from('recipe_books')
@@ -35,6 +38,7 @@ export default function RecipeBooksScreen() {
             }
 
             setBooks(data || []);
+            setLoading(false);
 
         };
 
@@ -127,29 +131,33 @@ export default function RecipeBooksScreen() {
             />
 
             {/* Book list */}
-            {
-                filteredBooks.length === 0 ? (
-                    <Text>No recipe books found.</Text>
-                ) : (
-                    filteredBooks.map((book) => (
-                        <Box key={book.id}>
-                            <View sx={{ bg: '$background', p: 'xs', mb: 's', borderRadius: 'm' }}>
-                                <Text variant="heading">{book.name}</Text>
-                                <Text variant="small">Created: {new Date(book.created_at).toLocaleDateString()}</Text>
-                            </View>
+            {loading ? (
+                <View sx={{ alignItems: 'center', marginTop: 20 }}>
+                    <ActivityIndicator size="large" />
+                </View>
+            ) : filteredBooks.length === 0 ? (
 
-                            <Button
-                                color='$primary'
-                                title='View'
-                                onPress={() =>
-                                    router.push(`/recipes?book_id=${book.id}`)
-                                }
-                            >
+                <Text>No recipe books found.</Text>
+            ) : (
+                filteredBooks.map((book) => (
+                    <Box key={book.id}>
+                        <View sx={{ bg: '$background', p: 'xs', mb: 's', borderRadius: 'm' }}>
+                            <Text variant="heading">{book.name}</Text>
+                            <Text variant="small">Created: {new Date(book.created_at).toLocaleDateString()}</Text>
+                        </View>
 
-                            </Button>
-                        </Box>
-                    ))
-                )
+                        <Button
+                            color='$primary'
+                            title='View'
+                            onPress={() =>
+                                router.push(`/recipes?book_id=${book.id}`)
+                            }
+                        >
+
+                        </Button>
+                    </Box>
+                ))
+            )
             }
         </ScrollView >
     );
