@@ -154,12 +154,12 @@ export default function RecipeBooksScreen() {
                             }
                         />
 
-                        {<Button
+                        {/* <Button
                             color='$secondary'
                             title='Edit book'
                             onPress={() => router.push(`/recipeBooks/editBook?book_id=${book.id}`)}
-                        />}
-
+                        />
+ */}
                     </Box>
                 ))
             )

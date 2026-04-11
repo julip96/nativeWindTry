@@ -32,6 +32,9 @@ export default function RecipeDetailsScreen() {
 
                 setRecipe(data)
 
+                // saving images does not work. just for testing
+                console.log("Loaded image: ", recipe?.image_url)
+
             } catch (e) {
 
                 console.error('Error loading recipe: ', e)
@@ -42,6 +45,7 @@ export default function RecipeDetailsScreen() {
 
         loadRecipe()
     }, [id])
+
 
     if (!recipe) return <Text>Recipe not found</Text>
 
@@ -81,6 +85,8 @@ export default function RecipeDetailsScreen() {
         typeof recipe.ingredients === 'string'
             ? JSON.parse(recipe.ingredients)
             : recipe.ingredients
+
+
 
     return (
 

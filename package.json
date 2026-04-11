@@ -21,6 +21,7 @@
     "@rneui/base": "5.0.0",
     "@rneui/themed": "5.0.0",
     "@supabase/supabase-js": "^2.76.0",
+    "base64-arraybuffer": "^1.0.2",
     "dotenv": "^17.4.1",
     "dripsy": "^4.3.8",
     "expo": "54.0.13",

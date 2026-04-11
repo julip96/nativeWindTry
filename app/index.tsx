@@ -1,6 +1,5 @@
 import { Text, View, P, ScrollView } from "dripsy";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   return (
@@ -40,7 +39,7 @@ export default function Index() {
       </Text>
 
 
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
     </ScrollView>
 

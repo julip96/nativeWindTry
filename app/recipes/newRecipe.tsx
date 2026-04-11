@@ -8,6 +8,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 
+import { decode } from "base64-arraybuffer";
+
 import { Pressable, ScrollView, Text, TextInput, View } from "dripsy";
 
 import { supabase } from "@/utils/supabase";
@@ -15,10 +17,13 @@ import Box from "@/components/Box";
 import UserInput from "@/components/UserInput";
 import Button from "@/components/Button";
 import PhotoPickerBox from '@/components/PhotoPickerBox';
+import { useSession } from "@/components/SessionProvider";
 
 export default function NewRecipe() {
 
   const router = useRouter();
+
+  const { session } = useSession();
 
   // loading states
   const [savingRecipe, setSavingRecipe] = useState(false);
@@ -30,7 +35,7 @@ export default function NewRecipe() {
   const [books, setBooks] = useState<{ id: string; name: string }[]>([]);
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
-  const [userId, setUserId] = useState<string | null>(null);
+  const userId = session?.user.id;
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [image, setImage] = useState<string | null>(null);
@@ -50,6 +55,7 @@ export default function NewRecipe() {
 
         const { data: userData, error: userError } = await supabase.auth.getUser();
 
+
         if (userError || !userData.user) {
 
           console.error("Error fetching user:", userError);
@@ -57,7 +63,10 @@ export default function NewRecipe() {
 
         }
 
-        setUserId(userData.user.id);
+        //setUserId(userData.user.id);
+        //setUserId(session)
+        console.log("Current user ID: ", userId);
+        console.log("Current user ID: ", userData.user.id);
 
         const { data: booksData, error: booksError } = await supabase
           .from("recipe_books")
@@ -144,6 +153,7 @@ export default function NewRecipe() {
       Alert.alert("Error", "Could not save recipe.");
     } finally {
       setSavingRecipe(false);
+      loadImage();
     }
   };
 
@@ -171,24 +181,40 @@ export default function NewRecipe() {
     return true;
   };
 
+  // Use phone gallery to pick image and set image uri. cut in two functions to avoid too much nesting in the onPress handler of the button
   const handlePickImage = useCallback(async () => {
+
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (!permission.granted) {
-      Alert.alert("Permission required", "We need access to your photos!");
+      Alert.alert("Permission required", "Permission to acces the media library is required to upload recipe images.");
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images',
       allowsEditing: true,
       quality: 0.8,
+      base64: true,
     });
 
     if (!result.canceled && result.assets.length > 0) {
       setImage(result.assets[0].uri);
     }
+
+    console.log("Image picker result: ", result.assets?.[0].base64);
+
   }, []);
 
+  // Use phone camera to take image and set image . cut in two functions to avoid too much nesting in the onPress handler of the button
   const handleTakePhoto = useCallback(async () => {
+
+    if (!userId) {
+
+      Alert.alert("Error", "No user ID found. Please log in again.");
+      return;
+    }
+
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
       Alert.alert("Permission required", "We need access to your camera!");
@@ -198,12 +224,65 @@ export default function NewRecipe() {
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       quality: 0.8,
+      base64: true,
     });
 
     if (!result.canceled && result.assets.length > 0) {
       setImage(result.assets[0].uri);
+      saveImage(result.assets?.[0].base64 || "", userId);
     }
+
+    console.log("Camera result: ", result.assets?.[0].base64);
+
+
+
+
   }, []);
+
+  const saveImage = async (base64Data: string, currentUserId: string | null) => {
+    if (!currentUserId) {
+      console.error("Cannot save image: No user ID");
+      return;
+    }
+
+    try {
+
+      console.log("Saving image for user: ", userId);
+      const { data, error } = await supabase.storage
+        .from('recipe_images')
+        .upload(`${currentUserId}/${Date.now()}.jpg`, decode(base64Data), {
+          contentType: 'image/jpeg',
+        });
+
+      if (error) {
+        console.error("Error uploading image: ", error);
+        return;
+      } else {
+        console.log("Image uploaded successfully: ", data);
+      }
+
+    }
+    catch (e) {
+      console.error("Error uploading image: ", e);
+    } finally {
+
+    }
+  }
+
+  const loadImage = async () => {
+    try {
+      const { data, error } = await supabase.storage
+        .getBucket('recipe_images');
+      console.log("Loaded image data: ", data?.id);
+    }
+    catch (e) {
+      console.error("Error downloading image: ", e);
+      return;
+    } finally {
+
+    }
+
+  }
 
   const scrollViewRef = useRef<ScrollViewType | null>(null);
 
