@@ -18,12 +18,15 @@ import UserInput from "@/components/UserInput";
 import Button from "@/components/Button";
 import PhotoPickerBox from '@/components/PhotoPickerBox';
 import { useSession } from "@/components/SessionProvider";
+import { uploadRecipeImagePrivateBucketSupabase } from "../functions/uploadRecipeImagePrivateBucketSupabase";
 
 export default function NewRecipe() {
 
   const router = useRouter();
 
+  // get user id
   const { session } = useSession();
+  const userId = session?.user.id;
 
   // loading states
   const [savingRecipe, setSavingRecipe] = useState(false);
@@ -35,10 +38,10 @@ export default function NewRecipe() {
   const [books, setBooks] = useState<{ id: string; name: string }[]>([]);
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
-  const userId = session?.user.id;
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [image, setImage] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
 
   // Ingredients
   const [ingredients, setIngredients] = useState<
@@ -46,32 +49,17 @@ export default function NewRecipe() {
   >([{ amount: "", unit: "g", name: "" }]);
   const units = ["-", "g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"];
 
-  // 👤 Lade User und Kochbücher
+  // Load cookbooks
   useEffect(() => {
 
     const fetchUserAndBooks = async () => {
 
       try {
 
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-
-
-        if (userError || !userData.user) {
-
-          console.error("Error fetching user:", userError);
-          return;
-
-        }
-
-        //setUserId(userData.user.id);
-        //setUserId(session)
-        console.log("Current user ID: ", userId);
-        console.log("Current user ID: ", userData.user.id);
-
         const { data: booksData, error: booksError } = await supabase
           .from("recipe_books")
           .select("*")
-          .eq("owner_id", userData.user.id)
+          .eq("owner_id", userId)
           .order("name");
 
         if (booksError) console.error("Error fetching cookbooks:", booksError);
@@ -83,7 +71,8 @@ export default function NewRecipe() {
         }
 
       } finally {
-
+        // after sourcing function out it should return cookbooks
+        return;
       }
 
     };
@@ -116,6 +105,95 @@ export default function NewRecipe() {
   const handleRemoveIngredient = useCallback((index: number) => {
     setIngredients((prev) => prev.filter((_, i) => i !== index));
   }, []);
+  // Use phone gallery to pick image and set image uri. cut in two functions to avoid too much nesting in the onPress handler of the button
+  const handlePickImage = useCallback(async () => {
+    if (!userId) {
+
+      Alert.alert("Error", "No user ID found. Please log in again.");
+      return;
+    }
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Permission to acces the media library is required to upload recipe images.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images',
+      allowsEditing: true,
+      quality: 0.8,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+
+      // for uploading to db
+      setImageBase64(result.assets[0].base64 ?? null);
+      // for saving local uri to recipe
+      setImage(result.assets[0].uri);
+      console.log("Image picked, URI: ", result.assets[0].uri);
+
+    }
+    console.log("Image was picked and set as image, but not yet uploaded to storage");
+
+
+  }, []);
+
+  // Use phone camera to take image and set image . cut in two functions to avoid too much nesting in the onPress handler of the button
+  const handleTakePhoto = useCallback(async () => {
+
+    if (!userId) {
+
+      Alert.alert("Error", "No user ID found. Please log in again.");
+      return;
+    }
+
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "We need access to your camera!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: 'images',
+      allowsEditing: true,
+      quality: 0.8,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      // for uploading to db
+      setImageBase64(result.assets[0].base64 ?? null);
+      // for saving local uri to recipe
+      setImage(result.assets[0].uri);
+      console.log("Photo taken, URI: ", result.assets[0].uri);
+    }
+    console.log("Photo was taken and set as image, but not yet uploaded to storage.");
+
+  }, []);
+
+  const loadImage = async () => {
+    try {
+      const { data, error } = await supabase.storage
+        //.getBucket("recipe_images")
+
+
+        .from("recipe_images").download(`${userId}/${image}.jpg`);
+
+      if (error) {
+        console.error("Error downloading image: ", error);
+        return;
+      }
+
+      console.log("Load image data: ", data, error);
+      //  console.log("Loaded image data: ", data?.id, data?.name, data?.owner);
+    }
+    catch (e) {
+      console.error("Error downloading image: ", e);
+      return;
+    }
+  }
 
   // Save Recipe
   const handleSaveRecipe = async () => {
@@ -128,6 +206,12 @@ export default function NewRecipe() {
 
     try {
 
+      const imageB64 = image ? await uploadRecipeImagePrivateBucketSupabase(imageBase64 ?? "", userId) : null;
+
+      if (!imageB64) {
+        throw new Error("Failed to upload image");
+      }
+
       const { data: recipeData, error } = await supabase
         .from("recipes")
         .insert([
@@ -136,10 +220,11 @@ export default function NewRecipe() {
             book_id: selectedBookId,
             title,
             instructions,
-            image_url: image,
+            local_image_url: image,
+            private_bucket_image_id: imageB64,
             ingredients: JSON.stringify(ingredients),
             rating: 0,
-            private: true,
+            private: true
           },
         ])
         .select()
@@ -153,7 +238,6 @@ export default function NewRecipe() {
       Alert.alert("Error", "Could not save recipe.");
     } finally {
       setSavingRecipe(false);
-      loadImage();
     }
   };
 
@@ -181,108 +265,7 @@ export default function NewRecipe() {
     return true;
   };
 
-  // Use phone gallery to pick image and set image uri. cut in two functions to avoid too much nesting in the onPress handler of the button
-  const handlePickImage = useCallback(async () => {
 
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permission.granted) {
-      Alert.alert("Permission required", "Permission to acces the media library is required to upload recipe images.");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'images',
-      allowsEditing: true,
-      quality: 0.8,
-      base64: true,
-    });
-
-    if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-    }
-
-    console.log("Image picker result: ", result.assets?.[0].base64);
-
-  }, []);
-
-  // Use phone camera to take image and set image . cut in two functions to avoid too much nesting in the onPress handler of the button
-  const handleTakePhoto = useCallback(async () => {
-
-    if (!userId) {
-
-      Alert.alert("Error", "No user ID found. Please log in again.");
-      return;
-    }
-
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert("Permission required", "We need access to your camera!");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      quality: 0.8,
-      base64: true,
-    });
-
-    if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-      saveImage(result.assets?.[0].base64 || "", userId);
-    }
-
-    console.log("Camera result: ", result.assets?.[0].base64);
-
-
-
-
-  }, []);
-
-  const saveImage = async (base64Data: string, currentUserId: string | null) => {
-    if (!currentUserId) {
-      console.error("Cannot save image: No user ID");
-      return;
-    }
-
-    try {
-
-      console.log("Saving image for user: ", userId);
-      const { data, error } = await supabase.storage
-        .from('recipe_images')
-        .upload(`${currentUserId}/${Date.now()}.jpg`, decode(base64Data), {
-          contentType: 'image/jpeg',
-        });
-
-      if (error) {
-        console.error("Error uploading image: ", error);
-        return;
-      } else {
-        console.log("Image uploaded successfully: ", data);
-      }
-
-    }
-    catch (e) {
-      console.error("Error uploading image: ", e);
-    } finally {
-
-    }
-  }
-
-  const loadImage = async () => {
-    try {
-      const { data, error } = await supabase.storage
-        .getBucket('recipe_images');
-      console.log("Loaded image data: ", data?.id);
-    }
-    catch (e) {
-      console.error("Error downloading image: ", e);
-      return;
-    } finally {
-
-    }
-
-  }
 
   const scrollViewRef = useRef<ScrollViewType | null>(null);
 

@@ -19,8 +19,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         })
 
         // try to see if i can track user id
-        console.log("SessionProvider log: ", session?.user.id);
 
+        console.log("SessionProvider log: ", session?.user.id);
         return () => {
             subscription.subscription.unsubscribe()
         }

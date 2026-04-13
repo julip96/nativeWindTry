@@ -157,9 +157,9 @@ export default function RecipesListScreen() {
                     >
                         <Text variant="heading">{recipe.title}</Text>
 
-                        {recipe.image_url ? (
+                        {recipe.local_image_url ? (
                             <Image
-                                source={{ uri: recipe.image_url }}
+                                source={{ uri: recipe.local_image_url }}
                                 style={{
                                     width: '100%',
                                     height: 120,
